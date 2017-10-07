@@ -1,2 +1,10 @@
 \subsection{Replication}
 \label{sec:replication}
+
+(work in progress...)
+
+Data replication is one of the major design approaches to achieve reliability and fault-tolerance in distributed systems: information is shared on redundant replicas such that any replica can become the new master if the current master replica fails. While enabling the system artifacts of fault-tolerance, reliability and availability, replication comes at a cost of performance: depending on the required operations in the system for replication, system performance can suffer significant bottlenecks. Different models of replication have been proposed to trade consistency for performance which resulted in different levels of consistency as a design choice for the target system.
+
+In order to support replication in the client-server paradigm present in network applications, the State Machine Replication model was proposed in the 1980s in \ref{Lamport:1984} and later refined in \ref{Schneider:1990}. It is based on the concept of distributed consensus in regard to reliably reaching a stable state of the system in the presence of failures. \ref{Lamport:1984} introduced the strategy of \textit{active} replication (also called \textit{primary-backup} or \textit{master-slave} scheme) where requests to the master replica are processed to all other replicas. Given the same initial state and request sequence, all replicas will produce the same response sequence and reach the same final state. 
+
+In the passive scheme (also called multi-primary or multi-master scheme), requests are first processed on the master replica and the resulting state is distributed to other replicas.
