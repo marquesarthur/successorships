@@ -1,2 +1,11 @@
 \subsection{Zeroconf Networks}
 \label{sec:zeroconf}
+
+
+
+Zero-configuration networking is a combination of protocols that aims to automatically discover computers or peripherals in a network without any central servers or human administration. To do so, Zero-configuration networks have two major components that provide {\it (i)} the automatic assignment of IP addresses and host naming (mDNS), and {\it (ii)} service discovery (DNS-SD).
+
+
+Roughly, when a device enters the local network, he assigns and IP/name to himself and then multicast that to the local network, resolving any name conflict that may occur in such process. IP assignment considers the link-local domain address, which draws addresses from the IPv4 169.254/16 prefix and, once an IP is selected, a host name with the suffix ``.local'' is mapped to that IP~\cite{rfc6762}. As devices are mapped to IPs/host names, their available services are discovered using a a combination of DNS PTR, SRV, and TXT records~\cite{rfc6763}, thus their services can be requested by other devices. 
+
+
