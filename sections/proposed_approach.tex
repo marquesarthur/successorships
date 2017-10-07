@@ -15,17 +15,17 @@ The model we propose for achieving this is one in which clients connecting to th
 \begin{itemize}
 	\item Constant: A GUID for the initial host node (the first to serve the application)
     \item The current state of the server
-	\item A "successorship" list: a list of (potentially not all of the) nodes in the local network, in order of "who is next" to assume server responsibilities, in the event that the server goes down
+	\item A ``successorship'' list: a list of (potentially not all of the) nodes in the local network, in order of ``who is next'' to assume server responsibilities, in the event that the server goes down
     \item Constant: The actual server code to execute, in the event that one of the clients needs to begin acting as the server
 \end{itemize}
 
-Note that the elements marked "(Constant)" are permanently fixed (for the lifetime of the application) when the initial server node first spins up the application server. 
+Note that the elements marked ``(Constant)'' are permanently fixed (for the lifetime of the application) when the initial server node first spins up the application server.
 
 We propose to develop a javascript library that implements the functionality listed above, providing a clean interface to enable developers to seamlessly integrate fault-tolerance into their offline client-server web applications, without having to worry about the details of how such fault-tolerance is achieved.
 
 \subsection{Interface}
 
-Our current running name for the library is \texttt{ftcs}, short for "fault-tolerant client-server". We propose to implement the following interface in \texttt{ftcs}:
+Our current running name for the library is \texttt{ftcs}, short for ``fault-tolerant client-server''. We propose to implement the following interface in \texttt{ftcs}:
 
 \begin{itemize}
 	\item Server side:
@@ -52,7 +52,7 @@ Our current running name for the library is \texttt{ftcs}, short for "fault-tole
 
 The client-server model describes a scenario in which one or many clients require a service or resources from a centralized server.\footnote{\url{https://en.wikipedia.org/wiki/Client\%E2\%80\%93server\_model}} Tacit in this model is the assumption that the server has access to resources that are unavailable to the client, whether this be compute power, storage, sensitive data, etc. Therefore, it seems potentially misguided to seek to migrate server functionality to arbitrary clients; it seems like we might be shoe-horning the client-server application model into working as a peer-to-peer service. It follows that our project might gain some clarity from listing some concrete use cases that would benefit from this fault tolerant behaviour, all the while maintaining the appearance of client-server communication. 
 
-One example we have come up with so far is a queue application, e.g. for a TA to use during office hours: the TA spins up the application on her phone, and as students enter the room, they connect to the server on the TA's phone and request to be enqueued. Maybe the TA needs to leave the room momentarily, and therefore has to leave the local network. In this event, we wish for the entire application state, and even the ability of new students to enqueue as they arrive, to persist even as the initial server host leaves the network ("distributed failover"). When the TA returns, the application seamlessly returns to being hosted on her device ("failback"). In this example, however, we need to be explicit about the gains obtained from adhering to this client-server model, rather than e.g. implementing this application as a peer-to-peer application.
+One example we have come up with so far is a queue application, e.g. for a TA to use during office hours: the TA spins up the application on her phone, and as students enter the room, they connect to the server on the TA's phone and request to be enqueued. Maybe the TA needs to leave the room momentarily, and therefore has to leave the local network. In this event, we wish for the entire application state, and even the ability of new students to enqueue as they arrive, to persist even as the initial server host leaves the network (``distributed failover''). When the TA returns, the application seamlessly returns to being hosted on her device (``failback''). In this example, however, we need to be explicit about the gains obtained from adhering to this client-server model, rather than e.g. implementing this application as a peer-to-peer application.
 
 \subsection{Limitations of FlyWeb}
 
