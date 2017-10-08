@@ -1,5 +1,4 @@
 \subsection{Flyweb}
 \label{sec:flyweb}
 
-FlyWeb\footnote{https://flyweb.github.io/spec/} is a web API developed by the Mozilla Firefox community\footnote{https://wiki.mozilla.org/FlyWeb} which enables web applications to connect and communicate to each other over a local-area network. 
-To do so, FlyWeb relies on a zero-configuration network and its mDNS/DNS-SD protocols~\cite{rfc6762, rfc6763}. With FlyWeb, a web page may be seen as a device, which hosts a server. This device advertises itself to other client devices in the local network and, eventually, these other clients will discover and connect to the advertised server. Thus, connected clients/servers enable cross-device communication.
+FlyWeb\footnote{https://flyweb.github.io/spec/} is a Web API developed by the Mozilla Firefox community\footnote{https://wiki.mozilla.org/FlyWeb} which enables clients of Web applications to publish a local server from within the browser. Building on the concept of zero-configuration networks and its mDNS/DNS-SD protocols~\cite{rfc6762, rfc6763}, the server advertises itself in the local network and can be discovered by other devices which become clients to the server by connecting via a HTTP or WebSocket connection. This essentially enables cross-device communication within a local-area network.
