@@ -25,13 +25,13 @@ We propose to develop a javascript library that implements the functionality lis
 
 \subsection{Interface}
 
-Our current running name for the library is \texttt{ftcs}, short for ``fault-tolerant client-server''. We propose to implement the following interface in \texttt{ftcs}:
+Our current running name for the library is \texttt{\APIName}\footnote{We still need a proper acronym for it, e.g. \APIshort}, i.e. the next ship that will lead the flotilla after yet another sunk boat. We propose to implement the following interface in \texttt{\APIName}:
 
 \begin{itemize}
 	\item Server side:
     \begin{itemize}
     \begin{ttfamily}
-      \item server = ftcs.initServer(name)
+      \item server = \APIshort.initServer(name)
       \item server.onReceive((msg, src) => \{ \})
       \item server.commitState(state)
       \item server.commitChange(change)
@@ -41,7 +41,7 @@ Our current running name for the library is \texttt{ftcs}, short for ``fault-tol
     \item Client side:
     	\begin{itemize}
     	\begin{ttfamily}
-    		\item connection = ftcs.connect(name)
+    		\item connection = \APIshort.connect(name)
             \item connection.onReceive((msg) => \{ \})
             \item connection.send(msg)
     	\end{ttfamily}
