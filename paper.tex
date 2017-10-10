@@ -1,5 +1,9 @@
-\documentclass{article}
+\documentclass[sigconf]{acmart}
 \usepackage[utf8]{inputenc}
+
+\settopmatter{printacmref=false}
+\renewcommand\footnotetextcopyrightpermission[1]{} % removes footnote with conference information in first column
+\pagestyle{plain}
 
 \usepackage{url}
 \usepackage{hyperref}
@@ -11,6 +15,8 @@
 }
 \urlstyle{same}
 
+
+
 \newcommand{\APIname}{\texttt{ftcs}}
 
 %opening
@@ -21,11 +27,9 @@
 
 \maketitle
 
-\begin{abstract}
+% \begin{abstract}
 
-\end{abstract}
-
-{\bf paper instructions:} https://www.cs.ubc.ca/~bestchai/teaching/cs527\_2017w1/proposals.html
+% \end{abstract}
 
 \input{sections/introduction}
 
