@@ -1,6 +1,10 @@
 \documentclass[sigconf]{acmart}
 \usepackage[utf8]{inputenc}
 
+\settopmatter{printacmref=false}
+\renewcommand\footnotetextcopyrightpermission[1]{} % removes footnote with conference information in first column
+\pagestyle{plain}
+
 \usepackage{url}
 \usepackage{hyperref}
 \hypersetup{
@@ -11,7 +15,7 @@
 }
 \urlstyle{same}
 
-\settopmatter{printacmref=false}
+
 
 \newcommand{\APIname}{\texttt{ftcs}}
 
