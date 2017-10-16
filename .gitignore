@@ -43,3 +43,6 @@ cleanup.sh
 *.auxlock
 *.markdown.*
 _markdown_main/
+
+# PTC - prefer not to track changes to generated pdfs in git
+*.pdf
