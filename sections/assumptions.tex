@@ -10,4 +10,7 @@ This status comes with all the responsibilities of the server, including executi
 Without any further substantial design considerations, this model would be extremely susceptible to a malicious client acquiring server status, and exploiting this status for their own ends, either by serving downright malicious material, or by more subtly forging application state.
 For an example of the latter, consider once again the \texttt{queue} app; when the TA leaves the room and one of the student devices becomes the server, that student could leverage her trusted position as the new server by pushing herself to the front of the line.
 
-% TODO (PTC): State further assumptions here.
+\subsubsection*{Updates to server-side state are small.}
+
+A core requirement of our model is that the server be able to broadcast its changes in state to all clients in the local network with relatively low latency, to diminish the possibility of clients' copies of server state being out of sync.
+Therefore, we assume that communication in the network is not traffic intensive, i.e. nodes neither produce bursts of requests in a small period of time, nor do they have payloads higher than some threshold $\tau$ that might generate bottlenecks in the network.
