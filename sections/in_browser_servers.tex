@@ -1,17 +1,8 @@
-\subsection{Related Platforms}
-\label{sec:related_platforms}
+\subsection{In-browser web servers}
+\label{sec:in_browser_servers}
 
-The concept of creating local ad-hoc networks with very little configuration has been under development for several years.
-
-Universal Plug and Play (UPnP) is one of the more widely-deployed examples of a zero-configuration networking technology in use today. 
-It consists of a set of networking protocols developed to facilitate interaction with services offered by any networked device on a local network.
-Since it leverages common protocols (HTTP/XML/SOAP on UDP/IP) and is agnostic to the link medium, it is truly cross-platform, extending not only to phones and laptops but also to printers, WiFi routers, and audio-visual equipment, to name a few examples.
-Many consumer devices currently come with UPnP capability built in.
-However, UPnP has been criticized for being insecure (by default, it assumes that all devices on the local network can be trusted, and so does not provide any means for authentication) and unscalable (due to use of multicast for service discovery).
-
-More recently in 2017, as part of its \textit{Nearby} project, \textit{Google} released its \textit{Connections} API, which enables Android devices in close proximity to one another to communicate in a peer-to-peer fashion.\footnote{https://developers.google.com/nearby/connections/overview}
-This is done over a seamless mix of Bluetooth, BLE, and WiFi hotspots.
-Unfortunately, Google has only made this API available on the Android platform; we seek a solution that is truly cross-platform.
+Another recent development in networking technology is the emergence of Web servers that run entirely within a Web browser. 
+The motivation is to simplify the process of serving Web content, thus potentially expanding the breadth of users capable of doing so.
 
 An early example of fully in-browser web server technology was Opera Unite.
 This extension to the Opera browser enabled users with Opera accounts to serve applications directly from their browsers to anyone on the Web, via a URL pointing to a subdomain on Opera's proxy servers.\footnote{https://maqentaer.com/devopera-static-backup/http/dev.opera.com/articles/view/opera-unite-developer-primer-revisited/index.html}
