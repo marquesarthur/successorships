@@ -1,0 +1,18 @@
+\subsection{In-browser web servers}
+\label{sec:in_browser_servers}
+
+Another recent development in networking technology is the emergence of Web servers that run entirely within a Web browser. 
+The motivation is to simplify the process of serving Web content, thus potentially expanding the breadth of users capable of doing so.
+
+An early example of fully in-browser web server technology was \textit{Opera Unite} (2009).
+This extension to the Opera browser enabled users with Opera accounts to serve applications directly from their browsers to anyone on the Web, via a URL pointing to a subdomain on Opera's proxy servers.\footnote{https://maqentaer.com/devopera-static-backup/http/dev.opera.com/articles/view/opera-unite-developer-primer-revisited/index.html}
+Communication between clients and servers in this way could either be direct peer-to-peer, or via Opera Unite's proxy servers.
+Though the service was popular with a sizeable subset of Opera users, especially for purposes such as file sharing and media streaming, Opera eventually retired it in 2012 to consolidate the multiple extension frameworks offered in its browser.\footnote{http://www.instantfundas.com/2012/04/opera-to-discontinue-unite-widgets-and.html}
+
+\textit{FlyWeb} is a Web API developed by the Mozilla Firefox community which enables clients of Web applications to publish a local server from within the browser.
+Building on the concept of zero-configuration networks and its mDNS/DNS-SD protocols~\cite{rfc6762, rfc6763}, the server advertises itself in the local network and can be discovered by other devices which become clients to the server by connecting via a HTTP or WebSocket connection.
+This essentially enables cross-device communication within a local-area network, without any need for an Internet connection.
+FlyWeb was released in mid-2016, but is no longer actively maintained as of August 2017.
+
+For our approach, we decided for FlyWeb since it is open source and entirely based on Web technology, making it widely available.
+We think that the idea of hosting an ad-hoc network from within a Web application in the browser has great potential, and we think that applications for this network can benefit from graceful recovery upon disconnection of local servers.

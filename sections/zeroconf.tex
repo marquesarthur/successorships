@@ -1,11 +1,11 @@
-\subsection{Zero-configuration Networks}
+\subsection{Zero-configuration networking}
 \label{sec:zeroconf}
 
-Zero-configuration networking is a combination of protocols that aim to automatically discover computers or peripherals in a network without any central servers or human administration. Zero-configuration networks have two major components that provide {\it (i)} automatic assignment of IP addresses and host naming (mDNS), and {\it (ii)} service discovery (DNS-SD).
+Zero-configuration networking (``zeroconf'') is a combination of protocols that aim to automatically discover computers or peripherals in a network without any central servers or human administration. Zero-configuration networks have two major components that provide {\it (i)} automatic assignment of IP addresses and host naming (mDNS), and {\it (ii)} service discovery (DNS-SD).
 
 When a device enters the local network, it assigns an IP/name pair to itself and  multicasts this pair to the local network, resolving any name conflicts that may occur in the process. IP assignment considers the link-local domain address which draws addresses from the IPv4 169.254/16 prefix and, once an IP address is selected, a host name with the suffix ``.local'' is mapped to that IP~\cite{rfc6762}. As devices are mapped to IPs/host names, their available services are discovered using a combination of DNS PTR, SRV, and TXT records~\cite{rfc6763}; their services can then be requested by other devices.
 
-The design focus of zero-configuration networking protocols is smooth assignment of names and discovery services without the configuration tasks normally present in network infrastructure. 
+The design focus of zero-configuration networking protocols is smooth assignment of names and discovery of services without the configuration tasks normally present in network infrastructure. 
 Our aim is to build upon the appealing features of zero-configuration networks by making them fault tolerant.
 This property is desirable in any scenario where network services need to remain stable even when the server node disconnects.
 In the zero-configuration setting, we anticipate that the hassle-free set-up will be complemented naturally by a system that enables a service to be provided in uninterrupted fashion, even when the server node disconnects.
