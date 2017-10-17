@@ -5,10 +5,9 @@ Our goal is to build a framework to facilitate the development of offline client
 We posit that the following features are prerequisites to achieving this:
 
 \begin{enumerate}
-    \item Nodes in the network trust each other;
     \item Any client, but exactly one client, has the ability to automatically assume the responsibilities of the server if the server goes down;
     \item All clients in the network have the capability to automatically update their connections to the new server in the event that the server migrates from one node to another;
-    \item Communication in the network is not traffic intensive, i.e. nodes neither produce bursts of requests in a small period of time nor have payloads higher than some threshold $\tau$ that might generate bottlenecks in the network;
+    \item (Optional, if we have time) The initial server node has the ability to resume responsibilities of the server once it comes back online (and can be reasonably believed to be robustly online)
     
 \end{enumerate}
 
@@ -28,3 +27,6 @@ We propose to develop a Javascript library that implements the functionality lis
 \input{sections/api}
 
 \input{sections/replication_strategy}
+
+\input{sections/assumptions}
+

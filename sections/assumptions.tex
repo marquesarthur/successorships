@@ -1,0 +1,16 @@
+\subsection{Assumptions}
+
+Our first version of this fault-tolerant extension to zero-configuration networks will necessarily have to make some simplifying assumptions, to make initial design and implementation tractable. 
+In particular, we assume the following, fully realizing that these may not hold for real-world practical use cases:
+
+\subsubsection*{The nodes in the network trust one another.} 
+
+An implication of our model is that any node in the network (with a reliable connection) may at some point become the application server.
+This status comes with all the responsibilities of the server, including executing the server-side application code, and hence maintaining the server-side application state.
+Without any further substantial design considerations, this model would be extremely susceptible to a malicious client acquiring server status, and exploiting this status for their own ends, either by serving downright malicious material, or by more subtly forging application state.
+For an example of the latter, consider once again the \texttt{queue} app; when the TA leaves the room and one of the student devices becomes the server, that student could leverage her trusted position as the new server by pushing herself to the front of the line.
+
+\subsubsection*{Updates to server-side state are small.}
+
+A core requirement of our model is that the server be able to broadcast its changes in state to all clients in the local network with relatively low latency, to diminish the possibility of clients' copies of server state being out of sync.
+Therefore, we assume that communication in the network is not traffic intensive, i.e. nodes neither produce bursts of requests in a small period of time, nor do they have payloads higher than some threshold $\tau$ that might generate bottlenecks in the network.
