@@ -35,7 +35,7 @@ In our queue system, one would initialize a server and define two functions to h
     function handleDequeue(req, event) { ... }
 
     (function main(){
-        server = ship.initServer("TAQueue");
+        server = sship.initServer("TAQueue");
         server.onReceive('queue', getQueue, 
             default=true);
         server.onReceive('enqueue', handleEnqueue);
@@ -47,7 +47,7 @@ In our queue system, one would initialize a server and define two functions to h
 
 \begin{lstlisting}[language=JavaScript]
     (function main(){
-        client = ship.initClient().connect("TAQueue");
+        client = sship.initClient().connect("TAQueue");
     })();
 \end{lstlisting}
 
@@ -56,24 +56,24 @@ In our queue system, one would initialize a server and define two functions to h
 
 \begin{lstlisting}[language=JavaScript]
     (function main(){
-        client1 = ship.initClient().connect("TAQueue");
+        client1 = sship.initClient().connect("TAQueue");
         client1.send(enqueue, 
             {student: "Arthur", csid: "cs4321"});
 
-        client2 = ship.initClient().connect("TAQueue");
+        client2 = sship.initClient().connect("TAQueue");
         client2.send(enqueue, 
             {student: "Paul", csid: "cs9876"});
     })();
 \end{lstlisting}
 
-{\bf Updating the server state: } Finally, it is necessary to define which data structures or variables are important for a server, thus the {\ttfamily commitState} function receives a function which is executed every time that a service is successfully requested and executed in that server. Revisiting our {\ttfamily server = ship.initServer("TAQueue")} code snippet, we would add a final function to define how the server would be updated after queueing/dequeuing students.
+{\bf Updating the server state: } Finally, it is necessary to define which data structures or variables are important for a server, thus the {\ttfamily commitState} function receives a function which is executed every time that a service is successfully requested and executed in that server. Revisiting our {\ttfamily server = sship.initServer("TAQueue")} code snippet, we would add a final function to define how the server would be updated after queueing/dequeuing students.
 
 \begin{lstlisting}[language=JavaScript]
     var queue = [];
     function currentQueue() { return queue; }
 
     (function main(){
-        server = ship.initServer("TAQueue");
+        server = sship.initServer("TAQueue");
         ...
         server.commitState(currentQueue);
     })();
