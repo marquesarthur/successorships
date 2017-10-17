@@ -1,0 +1,7 @@
+\subsection{What's happening under the hood?}
+
+When a server is initialized and it starts running, we envision that our API will create a state for that server and that this state is updated after the execution of any received message callback. 
+
+As clients connect to a server, the clients themselves assign their own host names and the server keeps a list of connected clients. Upon connection, the clients start a heart beat routine to monitor the server state. Clients are updated in two scenarios, the first one happens through one acknowledgement in the heart beat cycle while the other happens whenever a client receives an acknowledgement from a service usage. In both cases, the acknowledgement carries the server's current state and clients maintain a replica of that state within their storage memory.
+
+Upon failed messages, the clients will start their own servers with the same name as the one that they were connecting to, but followed by a randomly generated unique suffix. As this new server is started and broadcasted in the network, clients will detect other servers with the original server prefix and thus, they will have to reach a consensus among themselves on who will be the next leading server. Through this process, they will also exchange their own server states such that they can eventually identify which client has the most up-to-date state.
