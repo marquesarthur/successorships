@@ -1,7 +1,5 @@
 (function() {
 
-	//WSAPI.init("ws://localhost:3000");
-
 	let state = {
 		timestamp: 0,
 		queue: [],
@@ -17,12 +15,16 @@
 			Object.assign(state, newState);
 			console.log("New state was assigned");
 			console.log(state);
-			$('#queue').html(JSON.stringify(state.queue));
 		}
+	}
+
+	function updateUi() {
+		$('#queue').html(JSON.stringify(state.queue));
 	}
 
 	function init() {
 		WSAPI.on('message', function(evt) {
+			console.log("MESSAGE");
 			let payload = JSON.parse(evt.data);
 			if (payload.name === "stateupdate") {
 				let newState = payload.body;
@@ -31,12 +33,12 @@
 		});
 
 		WSAPI.on('open', function(evt) {
-			console.log(evt);
+			console.log("Client: OPEN");
 			//updateState(state, evt.data.state);
 		});
 
 		WSAPI.on('close', function(evt) {
-			console.log("CLOSE");
+			console.log("Client: CLOSE");
 			//updateState(state, evt.data.state);
 		});
 
@@ -62,6 +64,21 @@
 		});
 	}
 
-	alert("queuera");
+	if (!FW.isFlywebClient()) {
+		FW.becomeFlywebServer("Initial FlyWeb Server");
+	}
+
+	if (FW.isFlywebClient()) {
+		WSAPI.init("ws://" + window.location.hostname);
+		init();
+	}
+
+	$(document).ready(function() {
+		config.username = prompt("Please enter your name");
+		$('#name').text(config.username);
+		$('#queue').text(JSON.stringify(state.queue));
+	});
+
+
 
 }());

@@ -6,8 +6,25 @@ let FW = (function() {
 		jpg: "image/jpeg"
 	};
 
-	let initialHtml = "<!DOCTYPE html>" + document.documentElement.innerHTML;
+	let initialHtml;
 	let href = window.location.href;
+
+	let listeners = {};
+
+	function trigger(eventName, data) {
+		if (listeners[eventName]) {
+			for (let listener of listeners[eventName]) {
+				listener(data);
+			}
+		}
+	}
+
+	function bind(eventName, callback) {
+		if (!listeners[eventName]) {
+			listeners[eventName] = [];
+		}
+		listeners[eventName].push(callback);
+	}
 
 	function createOptions(mimeType) {
 		return {
@@ -31,12 +48,15 @@ let FW = (function() {
 		}
 	}
 
-	function becomeFlywebServer() {
-		navigator.publishServer("FlyWeb Queuera").then(function(server) {
+	function onWebsocket(event) {
+		let ws = event.accept();
+		trigger("websocket.open", { ws: ws });
+	}
+
+	function becomeFlywebServer(name) {
+		navigator.publishServer(name).then(function(server) {
 			server.onfetch = onFetch;
-			server.onwebsocket = function(evt) {
-				console.log("WEBSOCKET");
-			};
+			server.onwebsocket = onWebsocket;
 			server.onclose = function(evt) {
 				console.log("CLOSE");
 			};
@@ -51,12 +71,14 @@ let FW = (function() {
 		return numberOfDashes === 4;
 	}
 
-	if (!isFlywebClient()) {
-		becomeFlywebServer();
-	}
+	$(document).ready(function() {
+		initialHtml = $('html').html();
+	});
 
 	return {
-		becomeFlywebServer: becomeFlywebServer
+		becomeFlywebServer: becomeFlywebServer,
+		isFlywebClient: isFlywebClient,
+		bind: bind
 	};
 
 }());
