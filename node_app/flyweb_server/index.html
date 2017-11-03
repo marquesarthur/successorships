@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-flyweb-role="server">
     <!--<h1>FlyWeb Server</h1>-->
 
     <!--<script src="flyweb_server.js"></script>-->
@@ -22,6 +22,9 @@
             <span>Queue: </span><span id="queue"></span>
         </div>
         <div>
+            <span>Successors: </span><span id="successors"></span>
+        </div>
+        <div>
             <span>Student: </span>
             <a id="add" href="#">Add me!</a>
             <a id="remove" href="#">Remove me!</a>
@@ -34,7 +37,7 @@
         <img src="jpg/squirrel.jpg">
     </div>
 
-    <script src="js/flyweb_server.js"></script>
+    <script id="flyweb-server-script" src="js/flyweb_server.js"></script>
     <script src="js/queuera_server.js"></script>
     <script src="js/queuera_client.js"></script>
 

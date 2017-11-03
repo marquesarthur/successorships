@@ -7,12 +7,17 @@ let WSAPI = (function() {
 	}
 
 	function send(name, body, callback) {
-		let payload = {
-			name: name,
-			body: body
-		};
-		let json = JSON.stringify(payload);
-		ws.send(json, callback);
+		if (ws) {
+			let payload = {
+				name: name,
+				body: body
+			};
+			let json = JSON.stringify(payload);
+			ws.send(json, function(response) {
+				console.log("WSAPI response for '"+name+"': " + JSON.stringify(response));
+				callback(response);
+			});
+		}
 	}
 
 	function on(name, listener) {

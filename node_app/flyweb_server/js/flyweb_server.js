@@ -11,6 +11,8 @@ let FW = (function() {
 
 	let listeners = {};
 
+	let flywebHostname;
+
 	function trigger(eventName, data) {
 		if (listeners[eventName]) {
 			for (let listener of listeners[eventName]) {
@@ -48,15 +50,26 @@ let FW = (function() {
 		}
 	}
 
-	function onWebsocket(event) {
-		let ws = event.accept();
-		trigger("websocket.open", { ws: ws });
+	function onWebsocketOpen(initialEvent) {
+		let ws = initialEvent.accept();
+		ws.onopen = function(event) {
+			trigger("websocket.open", { ws: ws });
+		};
+		ws.onmessage = function(event) {
+			trigger("websocket.message", { ws: ws });
+		};
+		ws.onclose = function(event) {
+			trigger("websocket.close", { ws: ws });
+		};
+		ws.onerror = function(event) {
+			trigger("websocket.error", { ws: ws });
+		};
 	}
 
 	function becomeFlywebServer(name) {
 		navigator.publishServer(name).then(function(server) {
 			server.onfetch = onFetch;
-			server.onwebsocket = onWebsocket;
+			server.onwebsocket = onWebsocketOpen;
 			server.onclose = function(evt) {
 				console.log("CLOSE");
 			};
@@ -66,13 +79,11 @@ let FW = (function() {
 	}
 
 	function isFlywebClient() {
-		// Hack: FlyWeb URLs have 4 dashes
-		let numberOfDashes = (href.match(/-/g) || []).length;
-		return numberOfDashes === 4;
+		return $('html').attr('data-flyweb-role') === 'client';
 	}
 
 	$(document).ready(function() {
-		initialHtml = $('html').html();
+		initialHtml = '<html data-flyweb-role="client">'+$('html').html()+'</html>';
 	});
 
 	return {

@@ -1,4 +1,7 @@
-(function() {
+let QUEC = (function() {
+
+	let wsToSelfEstablished = false;
+	let clientId;
 
 	let state = {
 		timestamp: 0,
@@ -15,26 +18,42 @@
 			Object.assign(state, newState);
 			console.log("New state was assigned");
 			console.log(state);
+			updateUi();
 		}
 	}
 
 	function updateUi() {
-		$('#queue').html(JSON.stringify(state.queue));
+		$('#name').text(config.username);
+		$('#queue').text(JSON.stringify(state.queue));
+		$('#successors').text(JSON.stringify(state.successors));
 	}
+
+	let routeMethods = {
+		stateupdate: function(body) {
+			console.log("Client.routeMethod stateupdate => body: "+JSON.stringify(body));
+			updateState(body);
+			updateUi();
+		},
+		'handshake.server': function(body) {
+			clientId = body.clientId;
+			console.log("Client: handshake.server => body: "+JSON.stringify(body));
+		}
+	};
 
 	function init() {
 		WSAPI.on('message', function(evt) {
 			console.log("MESSAGE");
+			console.log(evt);
 			let payload = JSON.parse(evt.data);
-			if (payload.name === "stateupdate") {
-				let newState = payload.body;
-				updateState(newState);
-			}
+			let routeMethod = routeMethods[payload.name];
+			routeMethod && routeMethod(payload.body);
 		});
 
 		WSAPI.on('open', function(evt) {
 			console.log("Client: OPEN");
-			//updateState(state, evt.data.state);
+			WSAPI.send("handshake.client", {hostname: window.location.hostname}, function(response) {
+				//
+			});
 		});
 
 		WSAPI.on('close', function(evt) {
@@ -65,7 +84,13 @@
 	}
 
 	if (!FW.isFlywebClient()) {
-		FW.becomeFlywebServer("Initial FlyWeb Server");
+		FW.becomeFlywebServer("FlyWeb Server 1");
+		QUES.bind("handshake.client", function(data) {
+			if (!wsToSelfEstablished && data.hostname != window.location.hostname) {
+				WSAPI.init("ws://" + data.hostname);
+				init();
+			}
+		});
 	}
 
 	if (FW.isFlywebClient()) {
@@ -75,10 +100,13 @@
 
 	$(document).ready(function() {
 		config.username = prompt("Please enter your name");
-		$('#name').text(config.username);
-		$('#queue').text(JSON.stringify(state.queue));
+		updateUi();
 	});
 
-
+	return {
+		getClientId: function() {
+			return clientId;
+		}
+	};
 
 }());
