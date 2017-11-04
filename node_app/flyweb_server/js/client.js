@@ -17,10 +17,13 @@ let CLIENT = (function() {
 
 	if (isFlywebClient()) {
 		let ws = new WebSocket("ws://" + window.location.hostname);
-		ws.onopen = function(e) {
-			console.log("CLIENT OPEN");
-		};
-		ws.onmessage = function(e) {
+
+		ws.addEventListener("open", function(e) {
+			console.log("CLIENT: OPEN");
+		});
+
+		ws.addEventListener("message", function(e) {
+			console.log("CLIENT: MESSAGE");
 			let data = JSON.parse(e.data);
 			if (data.name === "welcome") {
 				clientId = data.body.clientId;
@@ -30,9 +33,16 @@ let CLIENT = (function() {
 				Object.assign(state, data.body.state);
 				updateUi();
 			}
+		});
 
-			console.log("CLIENT MESSAGE");
-		};
+		ws.addEventListener("close", function(e) {
+			console.log("CLIENT: CLOSE");
+		});
+
+		ws.addEventListener("error", function(e) {
+			console.log("CLIENT: ERROR");
+		});
+
 	} else {
 		S.becomeFlywebServer("FlyWeb WS-SIMPLE");
 		clientId = 0;

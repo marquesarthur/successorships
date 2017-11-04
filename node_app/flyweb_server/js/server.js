@@ -66,33 +66,37 @@ let S = (function() {
 
 		console.log("SERVER: INITIAL");
 
-		ws.onopen = function(event2) {
+		ws.addEventListener("open", function(e) {
 			console.log("SERVER: OPEN");
 			let clientId = new Date().getTime();
-			this.clientId = clientId;
+			ws.clientId = clientId;
 			wss.push(ws);
 			state.successors.push(clientId);
 			trigger('stateupdate', {state: state});
 			broadcastState(this);
-			this.send(JSON.stringify({name: "welcome",body:{clientId: clientId, state: state}}));
-		};
-		ws.onmessage = function(event2) {
+			ws.send(JSON.stringify({name: "welcome",body:{clientId: clientId, state: state}}));
+		});
+
+		ws.addEventListener("message", function(e) {
 			console.log("SERVER: MESSAGE");
-		};
-		ws.onclose = function(event2) {
-			if (this.clientId) {
-				let index = state.successors.indexOf(this.clientId);
+		});
+
+		ws.addEventListener("close", function(e) {
+			console.log("SERVER: CLOSE");
+			if (ws.clientId) {
+				let index = state.successors.indexOf(ws.clientId);
 				if (index >= 0) {
 					state.successors.splice(index, 1);
 					trigger('stateupdate', {state: state});
-					broadcastState(this);
+					broadcastState(ws);
 				}
 			}
+		});
 
-		};
-		ws.onerror = function(event2) {
+		ws.addEventListener("error", function(e) {
 			console.log("SERVER: ERROR");
-		};
+		});
+
 	}
 
 	function becomeFlywebServer(name) {
