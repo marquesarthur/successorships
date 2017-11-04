@@ -1,4 +1,4 @@
-let FW = (function() {
+let S = (function() {
 
 	let mimeTypes = {
 		css: "text/css",
@@ -7,11 +7,14 @@ let FW = (function() {
 	};
 
 	let initialHtml;
-	let href = window.location.href;
+
+	let state = {
+		successors: []
+	};
+
+	let wss = [];
 
 	let listeners = {};
-
-	let flywebHostname;
 
 	function trigger(eventName, data) {
 		if (listeners[eventName]) {
@@ -50,26 +53,52 @@ let FW = (function() {
 		}
 	}
 
-	function onWebsocketOpen(initialEvent) {
-		let ws = initialEvent.accept();
-		ws.onopen = function(event) {
-			trigger("websocket.open", { ws: ws });
+	function broadcastState(exceptWs) {
+		for (let ws of wss) {
+			if (ws !== exceptWs) {
+				ws.send(JSON.stringify({name: "stateupdate",body:{state: state}}));
+			}
+		}
+	}
+
+	function onWebsocket(event) {
+		let ws = event.accept();
+
+		console.log("SERVER: INITIAL");
+
+		ws.onopen = function(event2) {
+			console.log("SERVER: OPEN");
+			let clientId = new Date().getTime();
+			this.clientId = clientId;
+			wss.push(ws);
+			state.successors.push(clientId);
+			trigger('stateupdate', {state: state});
+			broadcastState(this);
+			this.send(JSON.stringify({name: "welcome",body:{clientId: clientId, state: state}}));
 		};
-		ws.onmessage = function(event) {
-			trigger("websocket.message", { ws: ws });
+		ws.onmessage = function(event2) {
+			console.log("SERVER: MESSAGE");
 		};
-		ws.onclose = function(event) {
-			trigger("websocket.close", { ws: ws });
+		ws.onclose = function(event2) {
+			if (this.clientId) {
+				let index = state.successors.indexOf(this.clientId);
+				if (index >= 0) {
+					state.successors.splice(index, 1);
+					trigger('stateupdate', {state: state});
+					broadcastState(this);
+				}
+			}
+
 		};
-		ws.onerror = function(event) {
-			trigger("websocket.error", { ws: ws });
+		ws.onerror = function(event2) {
+			console.log("SERVER: ERROR");
 		};
 	}
 
 	function becomeFlywebServer(name) {
 		navigator.publishServer(name).then(function(server) {
 			server.onfetch = onFetch;
-			server.onwebsocket = onWebsocketOpen;
+			server.onwebsocket = onWebsocket;
 			server.onclose = function(evt) {
 				console.log("CLOSE");
 			};
@@ -78,17 +107,12 @@ let FW = (function() {
 		});
 	}
 
-	function isFlywebClient() {
-		return $('html').attr('data-flyweb-role') === 'client';
-	}
-
 	$(document).ready(function() {
 		initialHtml = '<html data-flyweb-role="client">'+$('html').html()+'</html>';
 	});
 
 	return {
 		becomeFlywebServer: becomeFlywebServer,
-		isFlywebClient: isFlywebClient,
 		bind: bind
 	};
 
