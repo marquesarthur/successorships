@@ -99,13 +99,16 @@ let S = (function() {
 
 	}
 
-	function becomeFlywebServer(name) {
+	function becomeFlywebServer(name, newState) {
+		Object.assign(state, newState);
 		navigator.publishServer(name).then(function(server) {
+			console.log("NEW SERVER CREATED SUCCESSFULLY");
 			server.onfetch = onFetch;
 			server.onwebsocket = onWebsocket;
 			server.onclose = function(evt) {
 				console.log("CLOSE");
 			};
+			console.log(server);
 		}).catch(function(err) {
 			console.log("CATCH: " + errs);
 		});

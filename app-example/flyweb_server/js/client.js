@@ -1,4 +1,4 @@
-let CLIENT = (function() {
+let C = (function() {
 
 	let clientId;
 
@@ -15,8 +15,8 @@ let CLIENT = (function() {
 		return $('html').attr('data-flyweb-role') === 'client';
 	}
 
-	if (isFlywebClient()) {
-		let ws = new WebSocket("ws://" + window.location.hostname);
+	function becomeFlywebClient(wsUrl) {
+		let ws = new WebSocket(wsUrl);
 
 		ws.addEventListener("open", function(e) {
 			console.log("CLIENT: OPEN");
@@ -36,16 +36,39 @@ let CLIENT = (function() {
 		});
 
 		ws.addEventListener("close", function(e) {
-			console.log("CLIENT: CLOSE");
+			if (state.successors[0] === clientId) {
+				console.log("CLOSE: BECOME NEW SERVER");
+				// setTimeout(function() {
+				// 	S.becomeFlywebServer("b");
+				// 	S.bind("stateupdate", function(data) {
+				// 		Object.assign(state, data.state);
+				// 		updateUi();
+				// 	});
+				// }, 10000);
+			} else {
+				console.log("CLOSE: WAIT FOR NEW SERVER");
+				// setTimeout(function() {
+				// 	navigator.discoverNearbyServices({
+				// 		name: "b"
+				// 	}).then(function(service) {
+				// 		console.log(service);
+				// 	}).catch(function(err) {
+				// 		console.log("ERROR");
+				// 	})
+				// }, 20000);
+			}
 		});
 
 		ws.addEventListener("error", function(e) {
 			console.log("CLIENT: ERROR");
 		});
+	}
 
+	if (isFlywebClient()) {
+		becomeFlywebClient("ws://" + window.location.hostname + ":" + window.location.port);
 	} else {
-		S.becomeFlywebServer("FlyWeb WS-SIMPLE");
 		clientId = 0;
+		S.becomeFlywebServer("a", state);
 		S.bind("stateupdate", function(data) {
 			Object.assign(state, data.state);
 			updateUi();
@@ -57,6 +80,10 @@ let CLIENT = (function() {
 	});
 
 	return {
+		becomeFlywebClient: becomeFlywebClient,
+		becomeFlywebServer: function() {
+			S.becomeFlywebServer("a", state);
+		},
 		getClientId: function() {
 			return clientId;
 		}
