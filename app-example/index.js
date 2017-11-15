@@ -11,8 +11,8 @@ const port = 3000;
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-app.use(serveStatic('flyweb_server', {
-	index: ['index.html', 'index.htm']
+app.use(serveStatic('shippy_app', {
+	index: ['index.html']
 }));
 
 server.listen(port, function listening() {

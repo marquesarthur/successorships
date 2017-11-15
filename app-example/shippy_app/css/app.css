@@ -1,0 +1,9 @@
+#status {
+	width: 100px;
+	height: 100px;
+	background: red;
+}
+
+#status.connected {
+	background: green;
+}

@@ -10,6 +10,12 @@
 
 <body>
 
+    <script>
+        window.addEventListener("flywebServicesChanged", function(e) {
+        	console.log(e.detail);
+        });
+    </script>
+
     <div id="main">
         <div>
             <span>ClientID: </span><span id="clientid"></span>
