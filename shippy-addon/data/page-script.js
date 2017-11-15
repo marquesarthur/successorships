@@ -7,6 +7,6 @@ let listeners = {};
 self.port.on("servicesChanged", function(services) {
 	let data = { services: services };
 	content.dispatchEvent(new CustomEvent('flywebServicesChanged', {
-		detail: data
+		detail: JSON.stringify(data)
 	}));
 });
