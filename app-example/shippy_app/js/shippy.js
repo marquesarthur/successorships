@@ -33,6 +33,13 @@ let Shippy = (function() {
 		}
 	}
 
+	function call(operationName, params) {
+		// If       I'm the server, call appSpec.operations[operationName](STATE, params)
+		//          and broadcast the changes
+		// Else If  I'm the client, send a WebSocket message to the server with operationName and params
+		console.log("Operation called: " + operationName + "; params: " + JSON.stringify(params));
+	}
+
 	window.addEventListener("flywebServicesChanged", function(event) {
 		currentFlywebService = null;
 		if (appName) {
@@ -48,7 +55,8 @@ let Shippy = (function() {
 
 	return {
 		register: register,
-		on: on
+		on: on,
+		call: call
 	};
 
 }());
