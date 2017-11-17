@@ -2,17 +2,29 @@
 
 	let myName;
 
+	let appState;
+
+	function updateUi(state) {
+		$('#state').text(JSON.stringify(state));
+	}
+
 	let init = function(state) {
 		state.queue = [];
 		console.log("init called. State is now: " + JSON.stringify(state));
+		updateUi(state);
 	};
 
 	let operations = {
 		add: function(state, params) {
-			state.queue.push(params.name);
+			if (state.queue.indexOf(params.name) < 0) {
+				state.queue.push(params.name);
+			}
 		},
 		remove: function(state, params) {
-			Lib.removeFromArray(state.queue, params.name);
+			let index = state.queue.indexOf(params.name);
+			if (index >= 0) {
+				state.queue.splice(index, 1);
+			}
 		}
 	};
 
@@ -21,8 +33,19 @@
 		operations: operations
 	});
 
-	Shippy.on("statechange", function() {
-		console.log("STATECHANGE");
+	Shippy.on("stateupdate", function(state) {
+		console.log("STATEUPDATE");
+		updateUi(state);
+	});
+
+	Shippy.on("connect", function(state) {
+		console.log("CONNECT");
+		$('#connection-status').addClass('connected');
+
+	});
+	Shippy.on("disconnect", function(state) {
+		console.log("DISCONNECT");
+		$('#connection-status').removeClass('connected');
 	});
 
 	function onAddClick(e) {
