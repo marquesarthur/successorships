@@ -1,13 +1,14 @@
 {
-  "title": "Fly Web",
-  "name": "flyweb",
+  "title": "FlyWeb + shippy",
+  "name": "flyweb-shippy",
   "version": "0.0.1",
-  "description": "Web architecture for local-area applications",
+  "description": "A fork of the FlyWeb addon for the successorships library",
   "main": "index.js",
-  "author": "Kannan Vijayan",
+  "author": "Paul Cernek, Felix Grundt",
   "engines": {
     "firefox": ">=38.0a1",
     "fennec": ">=38.0a1"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {}
 }

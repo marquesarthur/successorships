@@ -1,5 +1,7 @@
 "use strict";
 
+var hostname = require("./hostname");
+
 class AdvertisedService {
   constructor({serviceName, name, port, options}) {
     this.serviceName = serviceName;
@@ -17,7 +19,8 @@ class AdvertisedService {
   }
 
   get target() {
-    return this.name + ".local";
+    // return this.name + ".local";
+      return hostname.hostName + ".local";
   }
 }
 

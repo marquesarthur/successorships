@@ -1,4 +1,4 @@
-var {Cc, Ci, Cu} = require("chrome");
+// var {Cc, Ci, Cu} = require("chrome");
 
 var utils = require("./utils");
 var {BinaryUtils} = require('./binary-utils');
@@ -26,12 +26,12 @@ var {DiscoverListenerList,
 const DNSSD_SERVICE_NAME    = '_services._dns-sd._udp.local';
 
 // Actual mDNS port and group
-//const DNSSD_MULTICAST_GROUP = '224.0.0.251';
-//const DNSSD_PORT            = 5353;
+const DNSSD_MULTICAST_GROUP = '224.0.0.251';
+const DNSSD_PORT            = 5353;
 
 // Fake prototype mDNS port and group
-const DNSSD_MULTICAST_GROUP = '224.0.1.253';
-const DNSSD_PORT            = 6363;
+// const DNSSD_MULTICAST_GROUP = '224.0.1.253';
+// const DNSSD_PORT            = 6363;
 
 var DNSSD = new EventTarget();
 
@@ -331,20 +331,22 @@ function discover(target) {
 
 function advertise() {
   if (advertiseRegistry.hasServices()) {
+    dump("[PAUL FLYWEB]: dns-sd.advertise has no services to advertise\n");
     return;
   }
 
+  dump("[PAUL FLYWEB]: Advertising DNS services from within dns-sd! \n");
   utils.getIp().then((ip) => {
     DNSSD.getAdvertisingSocket().then((socket) => {
       for (var fullname of advertiseRegistry.names()) {
         advertiseService(fullname, socket, ip);
       }
     }).catch((err) => {
-      dump("Caught error: " + err.toString() + "\n");
+      dump("[PAUL FLYWEB]: Caught error: " + err.toString() + "\n");
       dump(err.stack + "\n");
     });
   }).catch((err) => {
-    dump("Caught error: " + err.toString() + "\n");
+    dump("[PAUL FLYWEB]: Caught error: " + err.toString() + "\n");
     dump(err.stack + "\n");
   });
 }
@@ -437,5 +439,6 @@ exports.discoverRegistry = discoverRegistry;
 exports.discoverListeners = discoverListeners;
 exports.getIp = utils.getIp;
 exports.utils = utils;
+exports.advertise = advertise;
 
 exports.PACKETS = PACKETS;

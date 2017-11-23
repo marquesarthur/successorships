@@ -1,4 +1,4 @@
-//var { Cc, Ci, Cu, Cm } = require('chrome');
+// var { Cc, Ci, Cu, Cm } = require('chrome');
 
 delete window.Promise;
 
@@ -218,9 +218,10 @@ function connectToService(spec) {
     }));
 }
 
-function publishServer(name, options) {
+function publishServerAddOn(name, options) {
     return new window.Promise(XF((resolve, reject) => {
         try {
+            dump("Calling publishServerAddOn from within flyweb add-on: page-script.js\n");
             if (typeof(name) != 'string') {
                 reject("Server name must be a string.");
                 return;
@@ -244,7 +245,7 @@ function publishServer(name, options) {
             }
             options = localOptions;
 
-            SendRequest("publishServer", {name, options}, resp => {
+            SendRequest("publishServerAddOn", {name, options}, resp => {
                 let {httpServerId} = resp;
 
                 let onrequest = null;
@@ -401,8 +402,8 @@ exportFunction(discoverNearbyServices, window.navigator, {
 exportFunction(connectToService, window.navigator, {
     defineAs: 'connectToService'
 });
-exportFunction(publishServer, window.navigator, {
-    defineAs: 'publishServer'
+exportFunction(publishServerAddOn, window.navigator, {
+    defineAs: 'publishServerAddOn'
 });
 
 function XF(fn, obj, defName) {
@@ -419,3 +420,18 @@ function CI(obj) {
 function DEF_EVENT_PROP(obj, name, get, set) {
     window.Object.defineProperty(obj, name, CI({get, set}));
 }
+
+/*
+FELIX'S ADD-ON CODE BELOW
+ */
+
+let console = content.console;
+
+console.log("== My Flyweb Start ==");
+
+self.port.on("servicesChanged", function(services) {
+    let data = { services: services };
+    content.dispatchEvent(new CustomEvent('flywebServicesChanged', {
+        detail: JSON.stringify(data)
+    }));
+});

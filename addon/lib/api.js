@@ -11,8 +11,8 @@ function dispatchRequest(worker, name, obj, responseCallback) {
         func = discoverNearbyServices;
     } else if (name == "stopDiscovery") {
         func = stopDiscovery;
-    } else if (name == "publishServer") {
-        func = publishServer;
+    } else if (name == "publishServerAddOn") {
+        func = publishServerAddOn;
     } else if (name == "stopServer") {
         func = stopServer;
     } else if (name == "httpRequestRaw") {
@@ -119,7 +119,8 @@ function newHTTPRequestId() {
 }
 var HTTPServers = {};
 var HTTPRequests = {};
-function publishServer(worker, obj, responseCallback) {
+function publishServerAddOn(worker, obj, responseCallback) {
+    dump("publishServerAddOn being called from flyweb addon: api.js\n");
     let httpServerId = newHTTPServerId();
     let {name,options} = obj;
     let {rawRequest} = options;
@@ -211,6 +212,7 @@ function stopServer(worker, obj, responseCallback) {
 }
 
 function httpResponse(worker, obj, responseCallback) {
+    dump("httpResponse received in api.js!\n");
     let {httpRequestId, status, headers, body} = obj;
     if (!(httpRequestId in HTTPRequests)) {
         responseCallback({error:"Invalid http request id: " + httpRequestId});
