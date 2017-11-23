@@ -32,7 +32,10 @@ Shippy.Client = (function() {
 	// Become a Shippy client. When this is called there must be already a current Flyweb service available
 	// and its URL will be used for the WS connection.
 	function becomeClient() {
-		ws = new WebSocket("ws://" + Shippy.internal.currentFlywebService().serviceUrl);
+		console.log("BECOME CLIENT");
+		let socketURL = "ws://" + Shippy.internal.currentFlywebService().serviceUrl + "/web/socket";
+		console.log("Trying to connect to " + socketURL);
+		ws = new WebSocket(socketURL);
 
 		// Tell shippy that we are now connected.
 		ws.addEventListener("open", function(e) {
@@ -56,6 +59,8 @@ Shippy.Client = (function() {
 		// Don't really know what to do here
 		ws.addEventListener("error", function(e) {
 			Lib.log("CLIENT: ERROR");
+			// Presumably the websocket connection can also be considered to be "closed" if it throws an error
+      		Shippy.internal.connected(false);
 		});
 	}
 
@@ -66,10 +71,17 @@ Shippy.Client = (function() {
 		Lib.wsSend(ws, operationName, params);
 	}
 
+    // Returns true if the web socket is open.
+    // Mainly for debugging purposes
+    function checkSocketStatus() {
+		return ws.readyState === 1;
+	}
+
 	// Interface exposed as Shippy.Client
 	return {
 		becomeClient: becomeClient,
-		call: call
+		call: call,
+		checkSocketStatus: checkSocketStatus
 	};
 
 }());

@@ -1,4 +1,4 @@
-(function() {
+function runApp() {
 
 	let myName; // Will be set from the browser prompt when the site is accessed
 
@@ -77,4 +77,7 @@
 		$("#remove-button").click(onRemoveClick);
 	});
 
-}());
+}
+
+// To work properly with the FlyWeb add-on, the FlyWeb server must be published AFTER the page is loaded.
+$( document ).ready( runApp );

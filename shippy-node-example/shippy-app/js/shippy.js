@@ -163,6 +163,7 @@ let Shippy = (function() {
 	// Unfortunately, this is not always up-to-date, so we are confronted with delays.
 	window.addEventListener('flywebServicesChanged', function(event) {
 		// Reinit to null so if we don't find a service for our app right now we will now
+		console.log("flywebServicesChanged event received in local shippy instance!");
 		env.currentFlywebService = null;
 		if (env.appName) { // If an app was registered
 			let services = JSON.parse(event.detail).services;
@@ -180,7 +181,7 @@ let Shippy = (function() {
 			// and (b) env.isConnected was set to false before due to a disconnect (initially it was null)
 			// and (c) we should become the next server based on the succ list etc.
 			// then really become the server
-			else if (!env.currentFlywebService && env.isConnected === false && shouldBecomeNextServer()) {
+			else if (!env.currentFlywebService && env.isConnected !== null && shouldBecomeNextServer()) {
 				Shippy.Server.becomeServer();
 			}
 		}
