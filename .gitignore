@@ -50,5 +50,7 @@ _markdown_main/
 *.pdf
 
 # Felix
+node_modules/
+
 reveal-example
 reveal.js

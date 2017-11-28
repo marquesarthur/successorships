@@ -2,34 +2,94 @@
 <html data-flyweb-role="server">
 
 <head>
-    <title>Shippy Sample App</title>
-    <meta charset="utf-8"/>
+    <meta charset="UTF-8"/>
+    <title>A minimal example slide of reveal.js plus highlight.js</title>
+    <link rel="stylesheet" href="css/zenburn.css"/>
+    <link rel="stylesheet" href="css/reveal.css"/>
+    <link rel="stylesheet" href="css/black.css"/>
     <link rel="stylesheet" type="text/css" href="css/app.css">
 </head>
 
 <body>
 
-    <div id="main">
-        <div>Name: <span id="myname"></span></div>
-        <div>State: <span id="state"></span></div>
-        <a id="add-button" href="#">Add</a>
-        <a id="remove-button" href="#">Remove</a>
-        <div id="connection-status">Connected?</div>
+<div class="reveal">
+    <!-- Any section element inside of this container is displayed as a slide -->
+    <div class="slides">
+
+        <section>
+            <h1>H1 element</h1>
+            text...
+        </section>
+
+        <section>
+            <h2>H2 element</h2>
+            <p>A paragraph...</p>
+            <ul>
+                <li>Item-1</li>
+                <li>Item-2</li>
+                <li>Item-3</li>
+            </ul>
+        </section>
+
+        <section>
+            <section>
+                <h3>Highlight (javascript)</h3>
+                <pre class="javascript"><code>
+
+     genNodeName: (function() {
+                      var count = 0;
+                      return (function() {
+                                  count++;
+                                  var newName = "NODE" + count;
+                                  return newName;
+                              });
+                  })()
+
+</code></pre>
+            </section>
+            <section>
+                <h3>Highlight (bash)</h3>
+                <pre class="bash"><code>
+
+$ echo "Hello, world!"
+$ if [ -e README ]; then
+> echo 'README exists.'
+> else
+> echo "README doesn't exist."
+> fi
+
+</code></pre>
+            </section>
+            <section>
+                Where am I?
+            </section>
+        </section>
+
+        <section>
+            <h4>H4 element</h4>
+            <p>Another paragraph ...</p>
+        </section>
+
+        <section>
+            The end.
+        </section>
+
     </div>
 
-    <!-- Just for some DOM manipulation because I'm fast with jQuery -->
+</div>
+
     <script src="js/jquery.js"></script>
-    <!-- Just a static util library that can be used by all Shippy modules -->
     <script src="js/lib.js"></script>
-    <!-- The Shippy library hub -->
     <script src="js/shippy.js"></script>
-    <!-- Only Shippy server related stuff -->
     <script src="js/shippy-server.js"></script>
-    <!-- Only Shippy client related stuff -->
     <script src="js/shippy-client.js"></script>
 
-    <!-- Our queue app that doesn't know what's going on in shippy -->
+    <script src="js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+
+    <!-- Our app -->
     <script src="js/app.js"></script>
+
 
 </body>
 
