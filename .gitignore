@@ -48,3 +48,7 @@ _markdown_main/
 
 # PTC - prefer not to track changes to generated pdfs in git
 *.pdf
+
+# Felix
+reveal-example
+reveal.js
