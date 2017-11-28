@@ -1,3 +1,7 @@
+.reveal .slides section img {
+	border: 3px solid black;
+}
+
 html body {
 	background: #C4070F;
 }
@@ -16,14 +20,14 @@ html.connected[data-flyweb-role="server"] body {
 	position: absolute;
 	bottom: 0;
 	border-top: 5px solid black;
-	height: 50px;
+	height: 65px;
 	overflow: auto;
 }
 
 #status-bar {
 	width: 50%;
 	height: 50px;
-	display: block;
+	display: none;
 	float: left;
 	font-size: 20px;
 }
@@ -32,19 +36,16 @@ html.connected[data-flyweb-role="server"] body {
 	padding: 15px 0 0 10px;
 }
 
-#like-images {
-	width: 50%;
+#this-client {
+	width: 25%;
 	height: 50px;
-	display: block;
 	float: left;
-	overflow: hidden;
 }
 
-#like-images img {
-	width: 35px;
-	float: right;
-	display: inline-block;
-	margin: 5px 5px 0 0;
+#other-clients {
+	width: 25%;
+	height: 50px;
+	float: left;
 }
 
 #status-bar-wrap img {
