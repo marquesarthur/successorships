@@ -3,25 +3,20 @@
 	let revealInitialized = false;
 
 	function updateUi(state) {
-		Lib.log("updateUi", state);
-		if (revealInitialized && state.slide >= 0) {
-			Reveal.slide(state.slide);
+		if (state && revealInitialized) {
+			Lib.log("updateUi", state);
+			Reveal.setState(state.revealState);
 		}
-
 	}
 
 	let init = function(state) {
-		if (typeof state.slide !== 'number') {
-			state.slide = 0;
-		}
-
 		Lib.log("init called. State is now...", state);
 		updateUi(state);
 	};
 
 	let operations = {
-		setslide: function(state, params) {
-			state.slide = params.slide;
+		setRevealState: function(appState, params) {
+			appState.revealState = params.revealState;
 		}
 	};
 
@@ -37,10 +32,19 @@
 
 	Shippy.on("connect", function() {
 		Lib.log("App event received: connect");
+		$('html').addClass('connected');
 	});
 
 	Shippy.on("disconnect", function(state) {
 		Lib.log("App event received: disconnect");
+		$('html').removeClass('connected');
+	});
+
+	Shippy.on("servicefound", function(service) {
+		let url = "http://" + service.serviceUrl;
+		Lib.log("SERVICE", service);
+		$('#current-service-name').text(service.serviceName);
+		$('#current-service-url').attr("href", url).text(url);
 	});
 
 
@@ -64,11 +68,12 @@
 			transition: 'slide',
 			// Optional libraries used to extend on reveal.js
 			dependencies: [
-				{src: 'js/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad();}}
+				{src: 'js/highlight.js', async: true, callback: function() { hljs.initHighlighting();}}
 			]
 		});
 		Reveal.addEventListener('slidechanged', function(event) {
-			Shippy.call("setslide", { slide: event.indexh });
+			let revealState = Reveal.getState();
+			Shippy.call("setRevealState", { revealState: revealState });
 			// event.previousSlide, event.currentSlide, event.indexh, event.indexv
 		});
 		revealInitialized = true;

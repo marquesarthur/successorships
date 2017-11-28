@@ -1,10 +1,60 @@
-#connection-status {
-	width: 100px;
-	padding: 5px;
-	color: white;
-	background: red;
+html body {
+	background: #C4070F;
 }
 
-#connection-status.connected {
-	background: green;
+html.connected body {
+	background: #006B00;
+}
+
+html.connected[data-flyweb-role="server"] body {
+	background: #000E90;
+}
+
+#status-bar-wrap {
+	background: white;
+	width: 100%;
+	position: absolute;
+	bottom: 0;
+	border-top: 5px solid black;
+	height: 50px;
+	overflow: auto;
+}
+
+#status-bar {
+	width: 50%;
+	height: 50px;
+	display: block;
+	float: left;
+	font-size: 20px;
+}
+
+#status-bar-text {
+	padding: 15px 0 0 10px;
+}
+
+#like-images {
+	width: 50%;
+	height: 50px;
+	display: block;
+	float: left;
+	overflow: hidden;
+}
+
+#like-images img {
+	width: 35px;
+	float: right;
+	display: inline-block;
+	margin: 5px 5px 0 0;
+}
+
+#status-bar-wrap img {
+	display: inline-block;
+}
+
+#current-service-name {
+	font-weight: bold;
+}
+
+html.connected #status-bar {
+	display: inline-block;
 }
