@@ -78,17 +78,14 @@
                     <p>I want to write one such <strong>simple</strong> service?</p>
                     <ul>
                         <li>
-                            <!-- TODO: Felix - this first bullet point needs to be rephrased -->
-                            <p>Find a device server device</p>
+                            <p>Implement a server component that advertises a service (and ship the component to users)</p>
                         </li>
                         <li>
-                            <p>Write a service and advertise it somehow</p>
-                        </li>
-                        <li>
-                            <p>Write the app</p>
+                            <p>Write a client component communicating with the service (also ship that component to users)</p>
                         </li>
                     </ul>
                 </li>
+                <li>On what device/OS should these components run?</li>
             </ul>
         </section>
         <section>
@@ -100,8 +97,13 @@
                         <li>
                             <p>No special device/platform</p>
                         </li>
+                    </ul>
+                </li>
+                <li>
+                    <p>Clients can connect to the webapp with any browser</p>
+                    <ul>
                         <li>
-                            <p>No app download required</p>
+                            <p>No app installation required</p>
                         </li>
                     </ul>
                 </li>
@@ -111,19 +113,30 @@
             <h2 id="browser-3">This would...</h2>
             <ul>
                 <li>
-                    <p>Enable Zeroconf applications to run natively in the browser</p>
-                </li>
-                <li>
                     <p>Eliminate traditional installation models</p>
                 </li>
                 <li>
-                    <p>Enable anyone with a browser becoming a server!</p>
+                    <p>Enable any browser to become a server!</p>
                 </li>
             </ul>
         </section>
         <section>
-            <h2 id="browser-4">Browser vendors are trying...</h2>
+            <h2 id="browser-5">Imagine...</h2>
+        </section>
+        <section>
+            <h2 id="browser-6">Browser vendors are trying...</h2>
             <p><img src="png/vendors.png" alt="vendors"></p>
+        </section>
+        <section>
+            <h2 id="browser-7">Looks like this</h2>
+            <pre>
+                <code class="lang-javascript hljs">
+window.navigator.publishServer('527 Presentation')
+  .then(function(server) {
+    console.log("Server started");
+  });
+                </code>
+            </pre>
         </section>
         <section>
             <h2 id="problem">One Problem</h2>
