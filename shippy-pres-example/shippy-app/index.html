@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-flyweb-role="server">
+<html data-flyweb-role="server" class='connected'>
 <head>
     <meta charset="UTF-8"/>
     <title>A minimal example slide of reveal.js plus highlight.js</title>
@@ -12,13 +12,13 @@
 <body>
 
 <div class="reveal">
-    <div class="slides" style="width: 960px; height: 700px; left: 50%; top: 50%; bottom: auto; right: auto; transform: translate(-50%, -50%) scale(0.205714);">
+    <div class="slides" style="width: 960px; height: 700px; left: 50%; top: 50%; bottom: auto; right: auto; transform: translate(-50%, -50%)">
         <section data-markdown="" data-markdown-parsed="true" style="top: 130px; display: block;" class="present">
             <h1 id="successorships">Successorships</h1>
             <h2 id="fault-tolerant-local-webapps">Fault-tolerant local WebApps</h2>
             <p>Arthur Marques, Felix Grund, Paul Cernek</p>
         </section>
-        <section data-markdown="" data-markdown-parsed="true" style="top: 85px; display: block;" hidden="" aria-hidden="true" class="future">
+        <section data-markdown="" data-markdown-parsed="true" style="display: block;" hidden="" aria-hidden="true" class="future">
             <h2 id="overview">Overview</h2>
             <ul>
                 <li>
@@ -31,14 +31,14 @@
                     <p>Successorship</p>
                 </li>
                 <li>
-                    <p>Tentative evaluation</p>
+                    <p>API</p>
                 </li>
                 <li>
-                    <p>Future work</p>
+                    <p>Evaluation &amp; Future work</p>
                 </li>
             </ul>
         </section>
-        <section data-markdown="" data-markdown-parsed="true" style="top: 54.5px; display: block;" hidden="" aria-hidden="true" class="future">
+        <section data-markdown="" data-markdown-parsed="true" style="display: block;" hidden="" aria-hidden="true" class="future">
             <h2 id="context">Context</h2>
             <ul>
                 <li>Networking capabilities are becoming ubiquitous across different types of devices</li>
@@ -72,6 +72,27 @@
                 </li>
             </ul>
             <p><img src="jpg/chrome-cast.jpg" alt="chrome-cast"></p>
+        </section>
+        <section>
+            <h2 id="browser">Zeroconf - Browser</h2>
+            <ul>
+                <li>
+                    <p>Browser vendors can also integrate Zeroconf capabilities, e.g. Mozilla FlyWeb</p>
+                </li>
+            </ul>
+            <p><img style="width: 70%; height: 70%" src="jpg/flyweb-photo-wall-1.jpg" alt="flyweb-photo-wall-1"></p>
+        </section>
+        <section>
+            <h2 id="browser">Zeroconf - Browser</h2>
+            <ul>
+                <li>
+                    <p>Enables Zeroconf size applications to run natively into that browser</p>
+                </li>
+                <li>
+                    <p>Does not require traditional application `.pkg` or `X store` model</p>
+                </li>
+            </ul>
+            <p><img style="width: 50%; height: 50%" src="jpg/flyweb-photo-wall-2.jpg" alt="flyweb-photo-wall-2"></p>
         </section>
         <section>
             <h2 id="problem">Problem</h2>
@@ -126,6 +147,9 @@
                     <p>Clients in the network trust each other</p>
                 </li>
                 <li>
+                    <p>Network follows a star topology</p>
+                </li>
+                <li>
                     <p>Applications are not traffic intensive</p>
                     <ul>
                         <li>
@@ -162,10 +186,24 @@
             </ul>
         </section>
         <section>
-            <h2 id="step-by-step-3">Step-by-step</h2>
-            <p><img src="jpg/mdns-startup-3.jpg" alt="flow"></p>
+            <h2 id="step-by-step-3-1">Step-by-step</h2>
+            <p><img src="jpg/mdns-startup-3-1.jpg" alt="flow"></p>
             <ul>
-                <li>Upon service discovery, client open a new WebSocket connection to it</li>
+                <li>Upon service discovery, client makes a HTTP GET at /</li>
+            </ul>
+        </section>
+        <section>
+            <h2 id="step-by-step-3-2">Step-by-step</h2>
+            <p><img src="jpg/mdns-startup-3-2.jpg" alt="flow"></p>
+            <ul>
+                <li>Server serves initial html, js, css files</li>
+            </ul>
+        </section>
+        <section>
+            <h2 id="step-by-step-3-3">Step-by-step</h2>
+            <p><img src="jpg/mdns-startup-3-3.jpg" alt="flow"></p>
+            <ul>
+                <li>Client establish a WebSocket connection for further communication</li>
             </ul>
         </section>
         <section>
@@ -289,9 +327,67 @@ Shippy.on("stateupdate", function(state) {
             <p><img src="jpg/architecture.jpg" alt="architecture"></p>
         </section>
         <section>
+            <h2 id="state-broadcast">State broadcast</h2>
+            <ul>
+                <li>
+                    <p>Entire state</p>
+                </li>
+                <li>
+                    <p>Operation/payload to be executed on the client end</p>
+                </li>
+            </ul>
+        </section>
+        <section>
+            <h2 id="handled-scenarios">Hadled scenarios</h2>
+            <ul>
+                <li>
+                    <p>Client disconnection</p>
+                </li>
+                <li>
+                    <p>Server disconnection</p>
+                </li>
+                <li>
+                    <p>Chained disconnection: server and first `n` successors</p>
+                </li>
+            </ul>
+        </section>
+        <section>
             <blockquote>
                 <p>How do we plan to evaluate it?</p>
             </blockquote>
+        </section>
+        <section>
+            <h2 id="evaluation">Evaluation</h2>
+            <ul>
+                <li>
+                    <p>Proof of concept apps: `shippy-presentation` and `shippy-queue`</p>
+                </li>
+                <li>
+                    <p>TODO: Establish small wireless network and log metrics considering packets' size and # of connected clients</p>
+                    <ul>
+                        <li>
+                            <p>Recovery time, Messages RTT</p>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+        <section>
+            <h2 id="future-work">Future Work</h2>
+            <ul>
+                <li>
+                    <p>Improve recovery time</p>
+                </li>
+                <li>
+                    <p>Keep track of all applied operations to reconstruct the state</p>
+                </li>
+                <li>
+                    <p>Handling network partition/merging</p>
+                </li>
+            </ul>
+        </section>
+        <section>
+            <h2 id="thanks">Questions?</h2>
         </section>
     </div>
 </div>
@@ -313,6 +409,9 @@ Shippy.on("stateupdate", function(state) {
 <script src="js/shippy-client.js"></script>
 <script src="js/head.min.js"></script>
 <script src="js/reveal.js"></script>
+<!-- <script>
+    Reveal.initialize();
+</script> -->
 <!-- Our app -->
 <script src="js/app.js"></script>
 </body>
