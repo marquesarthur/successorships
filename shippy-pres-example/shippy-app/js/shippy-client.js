@@ -18,6 +18,7 @@ Shippy.Client = (function() {
 				// succ list.
 				Lib.wsSend(ws, "_revealdoublerole", {clientId: body.clientId});
 			}
+			Shippy.internal.trigger("clientid", { serving: Shippy.internal.serving(), clientId: body.clientId });
 		},
 		// The state was updated. If we don't have the double role we need to tell Shippy to update it's state.
 		stateupdate: function(body) {

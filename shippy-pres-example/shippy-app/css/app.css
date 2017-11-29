@@ -24,10 +24,18 @@ html.connected[data-flyweb-role="server"] body {
 	overflow: auto;
 }
 
-#status-bar {
-	width: 50%;
-	height: 50px;
+#status-bar-wrap > * {
 	display: none;
+	width: 30%;
+	border-right: 2px solid black;
+}
+
+html.connected #status-bar-wrap > * {
+	display: inline-block;
+}
+
+#status-bar {
+	height: 50px;
 	float: left;
 	font-size: 20px;
 }
@@ -36,13 +44,13 @@ html.connected[data-flyweb-role="server"] body {
 	padding: 15px 0 0 10px;
 }
 
-#this-client {
+#server-name {
 	width: 25%;
 	height: 50px;
 	float: left;
 }
 
-#other-clients {
+#successors {
 	width: 25%;
 	height: 50px;
 	float: left;
@@ -56,6 +64,4 @@ html.connected[data-flyweb-role="server"] body {
 	font-weight: bold;
 }
 
-html.connected #status-bar {
-	display: inline-block;
-}
+

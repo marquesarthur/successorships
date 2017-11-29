@@ -130,7 +130,7 @@ let Shippy = (function() {
 			env.serving = paramServing;
 			$('html').attr('data-flyweb-role', serving ? 'server' : 'client');
 		} else {
-			return env.serving;
+			return !!env.serving;
 		}
 	}
 
@@ -168,7 +168,7 @@ let Shippy = (function() {
 			let services = JSON.parse(event.detail).services;
 			for (let service of services) {
 				if (service.serviceName === env.appName) { // if this service is for our app
-					trigger("servicefound", service);
+					trigger("servicefound", service)
 					env.currentFlywebService = service; // then set it in our env
 				}
 			}
