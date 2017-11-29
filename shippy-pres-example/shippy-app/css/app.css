@@ -20,39 +20,38 @@ html.connected[data-flyweb-role="server"] body {
 	position: absolute;
 	bottom: 0;
 	border-top: 5px solid black;
-	height: 65px;
+	height: 10%;
 	overflow: auto;
 }
 
 #status-bar-wrap > * {
 	display: none;
-	width: 30%;
-	border-right: 2px solid black;
+	border-right: 5px solid black;
 }
 
 html.connected #status-bar-wrap > * {
 	display: inline-block;
+	height: 100%;
 }
 
 #status-bar {
-	height: 50px;
+	width: 40%;
+	height: 100%;
 	float: left;
-	font-size: 20px;
+	font-size: 1.5em;
 }
 
 #status-bar-text {
 	padding: 15px 0 0 10px;
 }
 
-#server-name {
-	width: 25%;
-	height: 50px;
+#server-name-wrap {
+	width: 20%;
 	float: left;
 }
 
-#successors {
-	width: 25%;
-	height: 50px;
+#successors-wrap {
+	width: 40%;
 	float: left;
 }
 

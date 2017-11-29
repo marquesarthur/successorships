@@ -25,7 +25,7 @@
 			}
 
 			if (state.serverName) {
-				$('#server-name').html(state.serverName);
+				$('#server-name').html('<span>'+state.serverName+'</span>');
 			}
 		}
 	}
