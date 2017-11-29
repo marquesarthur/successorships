@@ -20,32 +20,63 @@ html.connected[data-flyweb-role="server"] body {
 	position: absolute;
 	bottom: 0;
 	border-top: 5px solid black;
-	height: 65px;
+	height: 10%;
 	overflow: auto;
+	font-size: 1.5em;
+	font-family: Helvetica, sans-serif;
+}
+
+#status-bar-wrap > * {
+	display: none;
+	border-right: 5px solid black;
+}
+
+html.connected #status-bar-wrap > * {
+	display: inline-block;
 }
 
 #status-bar {
-	width: 50%;
-	height: 50px;
-	display: none;
+	width: 40%;
+	height: 100%;
 	float: left;
-	font-size: 20px;
 }
 
 #status-bar-text {
 	padding: 15px 0 0 10px;
 }
 
-#this-client {
-	width: 25%;
-	height: 50px;
+#server-name-wrap {
+	height: 100%;
+	width: 20%;
 	float: left;
 }
 
-#other-clients {
-	width: 25%;
-	height: 50px;
+#server-name {
+	height: 100%;
+}
+
+#server-name span, #successors span {
+	background-repeat: no-repeat;
+	background-size: 50px;
+	min-height: 35px;
+	display: inline-block;
+	margin: 10px;
+	padding-left: 60px;
+	padding-top: 15px;
+}
+
+#server-name span {
+	background-image: url("../png/server.png");
+}
+
+#successors-wrap {
+	height: 100%;
+	width: 30%;
 	float: left;
+}
+
+#successors-wrap span {
+	background-image: url("../png/ship.png");
 }
 
 #status-bar-wrap img {
@@ -54,8 +85,4 @@ html.connected[data-flyweb-role="server"] body {
 
 #current-service-name {
 	font-weight: bold;
-}
-
-html.connected #status-bar {
-	display: inline-block;
 }

@@ -1,22 +1,54 @@
 (function() {
 
 	let revealInitialized = false;
+	let lastSlideChange = 0;
+
+	let myName, clientId, serving;
 
 	function updateUi(state) {
 		if (state && revealInitialized) {
 			Lib.log("updateUi", state);
 			Reveal.setState(state.revealState);
+			$('#successors').html('');
+			$('#server-name').html('');
+
+			if (state.successors && state.names) {
+				let successorNames = [];
+				state.successors.forEach(function(clientId) {
+					if (state.names[clientId]) {
+						successorNames.push(state.names[clientId]);
+					}
+				});
+				successorNames.forEach(function(name) {
+					$('#successors').append('<span>'+name+'</span>');
+				});
+			}
+
+			if (state.serverName) {
+				$('#server-name').html('<span>'+state.serverName+'</span>');
+			}
 		}
 	}
 
 	let init = function(state) {
+		state.names = {};
 		Lib.log("init called. State is now...", state);
 		updateUi(state);
 	};
 
 	let operations = {
 		setRevealState: function(appState, params) {
+			lastSlideChange = new Date().getTime();
 			appState.revealState = params.revealState;
+		},
+		addName: function(appState, params) {
+			if (clientId) {
+				appState.names[params.clientId] = params.name;
+			}
+			console.log("ADDNAME", appState);
+		},
+		setServerName: function(appState, params) {
+			appState.serverName = params.name;
 		}
 	};
 
@@ -47,8 +79,22 @@
 		$('#current-service-url').attr("href", url).text(url);
 	});
 
+	Shippy.on("clientid", function(params) {
+		Lib.log("CLIENTID", params);
+		clientId = params.clientId;
+		serving = params.serving;
+		if (myName) {
+			Shippy.call("addName", { clientId: clientId, name: myName });
+		}
+		if (serving) {
+			Shippy.call("setServerName", { name: myName });
+		}
+	});
+
 
 	$(document).ready(function() {
+		myName = prompt("Who are you?");
+
 		Reveal.initialize({
 			// Display controls in the bottom right corner
 			controls: true,
@@ -72,12 +118,22 @@
 			]
 		});
 		Reveal.addEventListener('slidechanged', function(event) {
-			let revealState = Reveal.getState();
-			Shippy.call("setRevealState", { revealState: revealState });
-			// event.previousSlide, event.currentSlide, event.indexh, event.indexv
+			if (new Date().getTime() - lastSlideChange > 500) {
+				let revealState = Reveal.getState();
+				Shippy.call("setRevealState", { revealState: revealState });
+			} else {
+				Lib.log("SLIDECHANGE IGNORED");
+			}
 		});
+
 		revealInitialized = true;
 
+		if (clientId) {
+			Shippy.call("addName", { clientId: clientId, name: myName });
+		}
+		if (serving) {
+			Shippy.call("setServerName", { name: myName });
+		}
 	});
 
 }());
