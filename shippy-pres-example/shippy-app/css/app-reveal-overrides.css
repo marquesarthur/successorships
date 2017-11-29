@@ -5,3 +5,15 @@
 .reveal section h2 {
 	font-size: 1.4em;
 }
+
+.reveal .slides section ul li {
+  font-size :0.7em;
+}
+
+.reveal .slides section ul li p {
+  font-size: 1.4em;
+}
+
+.reveal .slides section ul li ul {
+  font-size: 1.15em;
+}
