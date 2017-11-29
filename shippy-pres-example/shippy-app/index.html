@@ -364,9 +364,6 @@ Shippy.on("stateupdate", function(state) {
             <h2 id="state-broadcast">State broadcast</h2>
             <ul>
                 <li>
-                    <p>Entire state</p>
-                </li>
-                <li>
                     <p>Operation/payload to be executed on the client end</p>
                 </li>
             </ul>
@@ -375,13 +372,13 @@ Shippy.on("stateupdate", function(state) {
             <h2 id="handled-scenarios">Handled scenarios</h2>
             <ul>
                 <li>
-                    <p>Client disconnection</p>
-                </li>
-                <li>
                     <p>Server disconnection</p>
                 </li>
                 <li>
-                    <p>Chained disconnection: server and first <code>n</code>> successors</p>
+                    <p>Client disconnection</p>
+                </li>
+                <li>
+                    <p>Chained disconnection</p>
                 </li>
             </ul>
         </section>
@@ -397,10 +394,13 @@ Shippy.on("stateupdate", function(state) {
                     <p>Proof of concept apps: <code>shippy-presentation</code> and <code>shippy-queue</code></p>
                 </li>
                 <li>
-                    <p>TODO: Establish small wireless network and log metrics considering packets' size and # of connected clients</p>
+                    <p>TODO: Establish small wireless network and log metrics</p>
                     <ul>
                         <li>
                             <p>Recovery time, Messages RTT</p>
+                        </li>
+                        <li>
+                            <p>Packets' size, # of connected clients</p>
                         </li>
                     </ul>
                 </li>
