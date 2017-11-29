@@ -19,19 +19,13 @@
             <p>Arthur Marques, Felix Grund, Paul Cernek</p>
         </section>
         <section>
-            <h2 id="overview">Overview</h2>
+            <h2 id="overview">Outline</h2>
             <ul>
-                <li>
-                    <p>Context</p>
-                </li>
                 <li>
                     <p>Motivation</p>
                 </li>
                 <li>
-                    <p>Successorship</p>
-                </li>
-                <li>
-                    <p>API</p>
+                    <p>Successorships</p>
                 </li>
                 <li>
                     <p>Evaluation &amp; Future work</p>
@@ -61,7 +55,7 @@
         <section>
             <h2 id="zero-configuration-networking-zeroconf-">Zero-configuration networking (Zeroconf)</h2>
             <ul>
-                <li>Combination of protocols that <strong>aim to automatically discover computers or peripherals</strong> in a network </li>
+                <li>Discovers computers or peripherals in a network automatically</li>
             </ul>
             <!-- * Without it, network administrators must configure devices using Dynamic Hosting Configuration Protocols (<code>DHCP</code>) and the Domain Name System (<code>DNS</code>) -->
         </section>
@@ -69,10 +63,10 @@
             <h2 id="zeroconf">Zeroconf</h2>
             <ul>
                 <li>
-                    <p>Devices are registered with unique IDs (<code>mDNS</code>)</p>
+                    <p><code>mDNS</code> (service advertisement) </p>
                 </li>
                 <li>
-                    <p>Device's services are broadcasted/discovered through the network (<code>DNS-SD</code>)</p>
+                    <p><code>DNS-SD</code> (service discovery)</p>
                 </li>
             </ul>
             <p><img src="jpg/chrome-cast.jpg" alt="chrome-cast"></p>
@@ -84,13 +78,14 @@
                     <p>I want to write one such <strong>simple</strong> service?</p>
                     <ul>
                         <li>
-                            <p>Find a device that works for you</p>
+                            <!-- TODO: Felix - this first bullet point needs to be rephrased -->
+                            <p>Find a device server device</p>
                         </li>
                         <li>
-                            <p>Write your service and advertise it somehow</p>
+                            <p>Write a service and advertise it somehow</p>
                         </li>
                         <li>
-                            <p>Write some kind of app for users</p>
+                            <p>Write the app</p>
                         </li>
                     </ul>
                 </li>
@@ -100,10 +95,15 @@
             <h2 id="browser-2">What if... (2)</h2>
             <ul>
                 <li>
-                    <p>I could just implement a Webapp that spins up a server and advertises a server?</p>
-                </li>
-                <li>
-                    <p>Then I would need no special device/platform and clients need not download an app</p>
+                    <p>I could just implement a Webapp that spins up a server and advertises it?</p>
+                    <ul>
+                        <li>
+                            <p>No special device/platform</p>
+                        </li>
+                        <li>
+                            <p>No app download required</p>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </section>
@@ -111,7 +111,7 @@
             <h2 id="browser-3">This would...</h2>
             <ul>
                 <li>
-                    <p>Enable Zeroconf size applications to run natively in the browser</p>
+                    <p>Enable Zeroconf applications to run natively in the browser</p>
                 </li>
                 <li>
                     <p>Eliminate traditional installation models</p>
@@ -154,7 +154,7 @@
         </section>
         <section>
             <blockquote>
-                <p>We hypothesize that fault-tolerance is a desirable property for Zeroconf applications that share a state</p>
+                <p>We claim that fault-tolerance is a desirable property for Zeroconf applications that share a state</p>
             </blockquote>
         </section>
         <section>
@@ -164,10 +164,10 @@
             <h2 id="goals">Goals</h2>
             <ul>
                 <li>
-                    <p>Provide an ease-of-use API to build Zeroconf browser apps</p>
+                    <p>Provide an ease-to-use API to build Zeroconf browser apps</p>
                 </li>
                 <li>
-                    <p>Decouple mDNS/DNS-SD logic from the application logic</p>
+                    <p>Decouple Zeroconf logic from the application logic</p>
                 </li>
                 <li>
                     <p>Seamlessly provide fault-tolerance to such apps</p>
@@ -181,7 +181,7 @@
                     <p>Clients in the network trust each other</p>
                 </li>
                 <li>
-                    <p>Network follows a star topology</p>
+                    <p>Applications follow a client-server model</p>
                 </li>
                 <li>
                     <p>Applications are not traffic intensive</p>
