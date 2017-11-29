@@ -3,7 +3,7 @@
 	let revealInitialized = false;
 	let lastSlideChange = 0;
 
-	let myName, clientId;
+	let myName, clientId, serving;
 
 	function updateUi(state) {
 		if (state && revealInitialized) {
@@ -82,10 +82,11 @@
 	Shippy.on("clientid", function(params) {
 		Lib.log("CLIENTID", params);
 		clientId = params.clientId;
+		serving = params.serving;
 		if (myName) {
 			Shippy.call("addName", { clientId: clientId, name: myName });
 		}
-		if (params.serving) {
+		if (serving) {
 			Shippy.call("setServerName", { name: myName });
 		}
 	});
@@ -129,6 +130,9 @@
 
 		if (clientId) {
 			Shippy.call("addName", { clientId: clientId, name: myName });
+		}
+		if (serving) {
+			Shippy.call("setServerName", { name: myName });
 		}
 	});
 
