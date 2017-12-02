@@ -1,0 +1,13 @@
+{
+  "title": "Shippy Addon",
+  "name": "shippy-addon",
+  "version": "0.0.1",
+  "description": "Shippy extension to FlyWeb",
+  "main": "index.js",
+  "author": "Felix Grund",
+  "engines": {
+    "firefox": ">=38.0a1",
+    "fennec": ">=38.0a1"
+  },
+  "license": "MIT"
+}

@@ -1,3 +1,5 @@
+flyweb-addon
+
 *.acn
 *.acr
 *.alg
@@ -46,3 +48,6 @@ _markdown_main/
 
 # PTC - prefer not to track changes to generated pdfs in git
 *.pdf
+
+# Felix
+node_modules/
