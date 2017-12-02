@@ -1,4 +1,7 @@
-flyweb-addon
+# BEGIN: dev stuff
+node_modules/
+
+# BEGIN: Paper/Latex stuff
 
 *.acn
 *.acr
@@ -49,5 +52,3 @@ _markdown_main/
 # PTC - prefer not to track changes to generated pdfs in git
 *.pdf
 
-# Felix
-node_modules/
