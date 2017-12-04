@@ -97,7 +97,7 @@ let Shippy = (function() {
 		Lib.log('Should become server? ' + should);
 		return should;
 	}
-
+	
 	function updateStateKeepSuccessors(params) {
 		// TODO: change from overriding the entire state to reconstructing the state based on a set of operations
 		let successors = env.state.successors;
@@ -179,7 +179,7 @@ let Shippy = (function() {
 			env.serving = paramServing;
 			$('html').attr('data-flyweb-role', serving ? 'server' : 'client');
 		} else {
-			return !!env.serving;
+			return env.serving;
 		}
 	}
 
@@ -225,7 +225,6 @@ let Shippy = (function() {
 			let services = JSON.parse(event.detail).services;
 			for (let service of services) {
 				if (service.serviceName === env.appName) { // if this service is for our app
-					trigger("servicefound", service);
 					env.currentFlywebService = service; // then set it in our env
 				}
 			}

@@ -16,7 +16,6 @@ Shippy.Server = (function() {
 		_revealdoublerole: function (state, params) {
 			Lib.log("Double role revealed: ", params.clientId);
 			Shippy.internal.removeSuccessor(params.clientId);
-			broadcastState();
 			// Should we trigger a broadcast here? I think I will always be the first client when I reveal
 			// myself but I'm not really sure.
 		},
