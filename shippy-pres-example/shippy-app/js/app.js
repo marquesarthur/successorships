@@ -3,6 +3,8 @@
 	let revealInitialized = false;
 	let lastSlideChange = 0;
 
+	var randonNames = ['John', 'Homer', 'Samus', 'Daenerys', 'Patrick', 'Nadine', 'Ned', 'Bart', 'Billy', 'Grim', 'Foo', 'Bar'];
+
 	let myName, clientId, serving;
 
 	function updateUi(state) {
@@ -93,7 +95,7 @@
 
 
 	$(document).ready(function() {
-		myName = prompt("Who are you?");
+		myName = randonNames[Math.floor(Math.random() * randonNames.length)]; //prompt("Who are you?");
 
 		Reveal.initialize({
 			// Display controls in the bottom right corner

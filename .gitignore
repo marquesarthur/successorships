@@ -1,6 +1,7 @@
 # BEGIN: dev stuff
 node_modules/
-
+.idea/
+**/.idea/
 # BEGIN: Paper/Latex stuff
 
 *.acn
