@@ -29,6 +29,16 @@ Shippy.Storage = (function() {
 		'ttf': 'font/ttf'
 	};
 
+	// Default path function to be used in addFiles if no preprocessing is required
+	let defaultPath = function (file) {
+		return file;
+	};
+
+	// Default key function to be used in addFiles if no preprocessing is required
+	let defaultKey = function (file) {
+		return '/'.concat(file);
+	};
+
 	// Converts a file to a MIME type
 	function fileToMime(file) {
 		let extension = file.split(".").pop();
@@ -65,13 +75,13 @@ Shippy.Storage = (function() {
 
 					try {
 						sessionStorage.setItem(key, JSON.stringify(data));
-						// Shippy.Util.log('File successfully added to session storage', key);
 					}
 					catch (e) {
 						Shippy.Util.log("Storage failed: ", e);
 					}
 				};
-				fileReader.readAsText(xhr.response);
+				// Encoding the file as Data URL makes it easier to serve different file types in the onFetch server function
+				fileReader.readAsDataURL(xhr.response);
 			}
 		}, false);
 		xhr.send();
@@ -88,7 +98,7 @@ Shippy.Storage = (function() {
 
 	// Iterate and add files to the session storage based on functions with extract the data required to do so
 	// Only add files which have a source path (src or href).
-	function addFiles(fileList, getPath, getKey, validate) {
+	function addFiles(fileList, getPath, getKey) {
 		for (let file of fileList) {
 			let path = getPath(file);
 			if (typeof path !== 'undefined' && path !== "") {
@@ -106,7 +116,10 @@ Shippy.Storage = (function() {
 			return script.src;
 		};
 		let getKey = function (script) {
-			return '/'.concat(script.src.replace(script.baseURI, ''));
+			// Workaround because of the frameworks that add #/ to the URI path
+			let aux = script.baseURI.replace('#/', '');
+			aux = '/'.concat(script.src.replace(aux, ''));
+			return aux;
 		};
 
 		addFiles(scripts, getPath, getKey);
@@ -119,19 +132,84 @@ Shippy.Storage = (function() {
 			return styleSheet.href;
 		};
 		let getKey = function (styleSheet) {
-			return '/'.concat(styleSheet.href.replace(styleSheet.ownerNode.baseURI, ''));
+			// Workaround because of the frameworks that add #/ to the URI path
+			let aux = styleSheet.ownerNode.baseURI.replace('#/', '');
+			aux = '/'.concat(styleSheet.href.replace(aux, ''));
+			return aux;
 		};
 
 		addFiles(styleSheets, getPath, getKey);
+		addEmbeddedUrls(styleSheets);
+	}
+
+	function addEmbeddedUrls(styleSheets) {
+		for (let styleSheet of styleSheets) {
+			if (!!styleSheet.cssRules) {
+				for (let rule of styleSheet.cssRules) {
+					if (rule.style && rule.style.backgroundImage) {
+						addCssBackgroundImage(rule.style.backgroundImage)
+					}
+				}
+			}
+		}
+	}
+
+	function addCssBackgroundImage(backgroundImage) {
+		const urlRgx = /url\((.*?)\)/g;
+		const urlPrefix = "url(\"".length;
+		const urlSuffix = "\")".length;
+		let matches = backgroundImage.match(urlRgx);
+		if (!!matches) {
+			let imgs = matches.map(function (img) {
+				let aux = img.substring(urlPrefix, img.length - urlSuffix);
+				if (aux.startsWith('data')) {
+					return null;
+				} else {
+					let path = aux.split("/");
+					path = path.filter(function (p) {
+						return p !== '..';
+					});
+					return path.join("/");
+				}
+			}).filter(function (img) {
+				return img !== null;
+			});
+
+			addFiles(imgs, defaultPath, defaultKey);
+		}
 	}
 
 	function addHtmls() {
 		let content = Shippy.internal.initialHtml();
 		let data = {mimeType: extToMimes.html, content: content};
 		sessionStorage.setItem('/', JSON.stringify(data));
-		// Shippy.Util.log('File successfully added to session storage', '/');
 		sessionStorage.setItem('/index.html', JSON.stringify(data));
-		// Shippy.Util.log('File successfully added to session storage', '/index.html');
+		addImages(content);
+	}
+
+	function addImages(html) {
+		// I need two regex because first I want to filter all images that have a src and then
+		// another one to fetch only the content inside the source
+		const imgRgx = /img(.*?)src=\"(.*?)\"/g;
+		const srcRgx = /src=\"(.*?)\"/g;
+		const srcPrefix = "src=\"".length;
+		const srcSuffix = "\"".length;
+		let matches = html.match(imgRgx);
+		if (!!matches) {
+			let imgs = matches.map(function (img) {
+				let src = img.match(srcRgx);
+				if (src) {
+					let aux = src[0].substring(srcPrefix, src[0].length - srcSuffix);
+					return aux.replace("\"", "");
+				} else {
+					return null;
+				}
+			}).filter(function (img) {
+				return img !== null;
+			});
+
+			addFiles(imgs, defaultPath, defaultKey);
+		}
 	}
 
 	function init() {
@@ -142,6 +220,7 @@ Shippy.Storage = (function() {
 
 	return {
 		get: get,
-		init: init
+		init: init,
+		extToMimes: extToMimes
 	}
 })();

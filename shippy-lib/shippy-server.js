@@ -48,11 +48,16 @@ Shippy.Server = (function() {
 		let url = event.request.url;
 		let file = Shippy.Storage.get(url);
 		if (file) {
-			event.respondWith(new Response(file.content, createOptions(file.mimeType)));
+			let options = createOptions(file.mimeType);
+			if (url === '/' || url === '/index.html') {
+				event.respondWith(new Response(file.content, options));
+			} else {
+				let blob = Shippy.Util.dataURItoBlob(file.content);
+				event.respondWith(new Response(blob, options));
+			}
 		} else {
 			event.respondWith(new Response({}, createOptions('application/json', 404)));
 		}
-
 	}
 
 	// Run through all WS connections and send the state.
