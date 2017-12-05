@@ -25,8 +25,7 @@ Shippy.Client = (function() {
 			Lib.log("Client route 'stateupdate' called", body);
 
 			if (!Shippy.internal.serving()) {
-				let updateFunc = getUpdateFunc(body);
-				updateState(isServerAhead(body), updateFunc);
+				updateState(body);
 			}
 			Shippy.internal.trigger("stateupdate", Shippy.internal.state());
 		}
@@ -39,29 +38,22 @@ Shippy.Client = (function() {
         return currentVersion <= serverVersion;
     }
 
-    // Check if the payload carries the entire update or just an operation.
-    // Based on that, this function creates an update function callback that will be used to update the client state
-    // The callback either overrides the entire state, or updates the state/version based on a registered operation
-	function getUpdateFunc(body) {
-		if (typeof body.state !== 'undefined') {
-			return function () {
-                Shippy.internal.state(body.state);
-            };
-		}
-		return function () {
-            routes[body.route] && routes[body.route](Shippy.internal.state(), body.payload);
-            Shippy.internal.updateVersion(body.version);
-        };
-    }
-
     // it will check whether the server has a state newer then the client
     // If it does, it will apply the state update function
     // Otherwise, it will send a _mostuptodate message back to the server
-    function updateState(isServerAhead, updateFunc) {
-        if (isServerAhead){
-            updateFunc();
+    function updateState(body) {
+    	let currentState = Shippy.internal.state();
+        if (isServerAhead(body)){
+        	if (body.state) {
+		        Shippy.internal.state(body.state);
+	        } else if (typeof body.version === 'number' && body.payload && body.route && routes[body.route]) {
+		        routes[body.route](currentState, body.payload);
+		        Shippy.internal.updateVersion(body.version);
+	        } else {
+        		Lib.log("Error in updateState", body);
+	        }
         } else {
-            Lib.wsSend(ws, "_mostuptodate", {state: Shippy.internal.state()});
+            Lib.wsSend(ws, "_mostuptodate", {state: currentState});
         }
     }
 
