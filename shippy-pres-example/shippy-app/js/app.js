@@ -9,7 +9,6 @@
 
 	function updateUi(state) {
 		if (state && revealInitialized) {
-			Lib.log("updateUi", state);
 			Reveal.setState(state.revealState);
 			$('#successors').html('');
 			$('#server-name').html('');
@@ -34,7 +33,7 @@
 
 	let init = function(state) {
 		state.names = {};
-		Lib.log("init called. State is now...", state);
+		Shippy.Util.log("init called. State is now...", state);
 		updateUi(state);
 	};
 
@@ -60,17 +59,17 @@
 	});
 
 	Shippy.on("stateupdate", function(state) {
-		Lib.log("App event received: stateupdate");
+		Shippy.Util.log("App event received: stateupdate");
 		updateUi(state);
 	});
 
 	Shippy.on("connect", function() {
-		Lib.log("App event received: connect");
+		Shippy.Util.log("App event received: connect");
 		$('html').addClass('connected');
 	});
 
 	Shippy.on("disconnect", function(state) {
-		Lib.log("App event received: disconnect");
+		Shippy.Util.log("App event received: disconnect");
 		$('html').removeClass('connected');
 	});
 
@@ -81,7 +80,7 @@
 	});
 
 	Shippy.on("clientid", function(params) {
-		Lib.log("CLIENTID", params);
+		Shippy.Util.log("CLIENTID", params);
 		clientId = params.clientId;
 		serving = params.serving;
 		if (myName) {
@@ -123,7 +122,7 @@
 				let revealState = Reveal.getState();
 				Shippy.call("setRevealState", { revealState: revealState });
 			} else {
-				Lib.log("SLIDECHANGE IGNORED");
+				Shippy.Util.log("SLIDECHANGE IGNORED");
 			}
 		});
 

@@ -1,4 +1,4 @@
-let Lib = (function() {
+Shippy.Util = (function() {
 
 	function wsSend(ws, route, body) {
 		ws.send(JSON.stringify({
