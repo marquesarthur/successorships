@@ -3,7 +3,7 @@
 	let revealInitialized = false;
 	let lastSlideChange = 0;
 
-	var randonNames = ['John', 'Homer', 'Samus', 'Daenerys', 'Patrick', 'Nadine', 'Ned', 'Bart', 'Billy', 'Grim', 'Foo', 'Bar'];
+	let randonNames = ['John', 'Homer', 'Samus', 'Daenerys', 'Patrick', 'Nadine', 'Ned', 'Bart', 'Billy', 'Grim', 'Foo', 'Bar'];
 
 	let myName, clientId, serving;
 
@@ -76,7 +76,6 @@
 
 	Shippy.on("servicefound", function(service) {
 		let url = "http://" + service.serviceUrl;
-		Lib.log("SERVICE", service);
 		$('#current-service-name').text(service.serviceName);
 		$('#current-service-url').attr("href", url).text(url);
 	});

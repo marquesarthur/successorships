@@ -71,7 +71,7 @@ Shippy.Client = (function() {
         // Mount the routes for the app operations onto our WS routes.
         // This is necessary in the client because state updates may carry operations rather than the entire state
         routes = Object.assign(routes, Shippy.internal.appSpec().operations);
-
+		Lib.log("BECOME CLIENT");
         ws = new WebSocket("ws://" + Shippy.internal.currentFlywebService().serviceUrl);
 
         // Tell shippy that we are now connected.
