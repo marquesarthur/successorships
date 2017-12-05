@@ -89,6 +89,7 @@ Shippy.Server = (function() {
 			let clientId = new Date().getTime();
 			ws.clientId = clientId;
 			wss[clientId] = ws;
+			Lib.trace({ timestamp: Date.now(), event: 'shippy_server_ws_open', source: Shippy.internal.clientId(), from: ws.clientId});
 			Shippy.internal.addSuccessor(clientId);
 			Shippy.Util.wsSend(ws, "welcome", {clientId: clientId});
 			broadcastState();
@@ -100,6 +101,10 @@ Shippy.Server = (function() {
 			Shippy.Util.log("SERVER: MESSAGE");
 			let data = Shippy.Util.wsReceive(e);
 			let currentState = Shippy.internal.state();
+
+			if (ws.clientId){
+				Lib.trace({ timestamp: Date.now(), event: 'shippy_server_received_'+data.route, source: Shippy.internal.clientId(), from: ws.clientId, pkgSize: Shippy.Util.payloadSize(data)});
+			}
 
 			routes[data.route] && routes[data.route](currentState, data.body);
 
@@ -120,6 +125,7 @@ Shippy.Server = (function() {
 		ws.addEventListener("close", function(e) {
 			Shippy.Util.log("SERVER: CLOSE");
 			if (ws.clientId) {
+				Lib.trace({ timestamp: Date.now(), event: 'shippy_server_ws_close', source: Shippy.internal.clientId(), from: ws.clientId});
 				delete wss[ws.clientId];
 				Shippy.internal.removeSuccessor(ws.clientId);
 				broadcastState();
@@ -136,9 +142,11 @@ Shippy.Server = (function() {
 	// Don't really know what to do here
 	function onClose() {
 		Shippy.Util.log("ON CLOSE");
+		Lib.trace({ timestamp: Date.now(), event: 'shippy_server_disconnecting', source: Shippy.internal.clientId()});
 	}
 
 	function becomeServer() {
+		Lib.trace({ timestamp: Date.now(), event: 'shippy_become_server_begin', source: Shippy.internal.clientId()});
 		// Mount the routes for the app operations onto our WS routes.
 		routes = Object.assign(routes, Shippy.internal.appSpec().operations);
 		Shippy.Util.log("BECOME SERVER");
@@ -153,8 +161,10 @@ Shippy.Server = (function() {
 			server.onwebsocket = onWebsocket;
 			server.onclose = onClose;
 			Shippy.Util.log(server);
+			Lib.trace({ timestamp: Date.now(), event: 'shippy_become_server_end', source: Shippy.internal.clientId()});
 		}).catch(function (err) {
 			Shippy.Util.log("Error creating server", err);
+			Lib.trace({ timestamp: Date.now(), event: 'shippy_become_server_error', source: Shippy.internal.clientId()});
 		});
 	}
 

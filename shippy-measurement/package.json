@@ -1,0 +1,13 @@
+{
+  "name": "shippy-measurement",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node index.js",
+    "eval": "node measurement.js"
+  },
+  "dependencies": {
+    "express": "~4.14.1",
+    "body-parser": "^1.18.2"
+  }
+}
