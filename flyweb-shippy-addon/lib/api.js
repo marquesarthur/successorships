@@ -77,15 +77,22 @@ function discoverNearbyServices(worker, obj, responseCallback) {
                         service: service
                     }));
                 } catch(err) {
-                    dump(debugPrefix + " Error emitting serviceFounc message: "
+                    dump(debugPrefix + " Error emitting serviceFound message: "
                         + err.message + "\n" + err.stack + "\n");
                 }
             } else {
-                worker.port.emit('message', JSON.stringify({
-                    messageName: 'serviceLost',
-                    messageId: serviceListId,
-                    service: service
-                }));
+                dump(debugPrefix + " Lost service: " +
+                    JSON.stringify(service) + "\n");
+                try {
+                    worker.port.emit('message', JSON.stringify({
+                        messageName: 'serviceLost',
+                        messageId: serviceListId,
+                        service: service
+                    }));
+                } catch(err) {
+                    dump(debugPrefix + " Error emitting serviceLost message: "
+                        + err.message + "\n" + err.stack + "\n");
+                }
             }
         }
     );

@@ -41,66 +41,16 @@ PageMod.PageMod({
                 resultObj.messageId = messageId;
                 worker.port.emit("response", JSON.stringify(resultObj));
             });
+
+            DNSSD.advertise();
         });
         worker.on('detach', function () {
+            dump("\n!!!***!!!\n\n");
+            dump("[flyweb.js] Detach event triggered!");
+            dump("\n!!!***!!!\n\n");
             API.unregisterWorker(this);
+            worker.port.emit("servicesChanged");
         });
 
-        /**
-         * FELIX'S CODE BELOW
-         */
-        // let Self = require('sdk/self');
-        // let PageMod = require('sdk/page-mod');
-        let WindowUtils = require("sdk/window/utils");
-        let { DiscoveryManager } = require('./discovery-manager');
-
-        dump("[MyFlyWeb-Addon] Attached to page!\n");
-        let lastEmit = 0;
-        let window = WindowUtils.getMostRecentBrowserWindow();
-        let discoveryManager = new DiscoveryManager(window);
-        discoveryManager.start(function (rawServices) {
-            let now = new Date().getTime();
-            if (now - lastEmit > 100) { // avoid duplicate triggers
-                lastEmit = now;
-                let services = [];
-                dump("RAW SERVICES: " + JSON.stringify(rawServices) + '\n');
-
-                // // XXX: hacks
-                // if (rawServices.length > 1) {
-                // for (let i = 1; i < rawServices.length; i++) {
-                // 	rawServices[i].unregister
-                // }
-                // }
-                for (let rawService of rawServices) {
-                    // dump('\nraw service proto: ');
-                    // dump(rawService.__proto__[0]);
-                    // dump('\n');
-                    // if (rawService.serviceType === "_flyweb._tcp.") {
-                    if (rawService.serviceType.startsWith("_flyweb._tcp")) {
-                        let rawServiceId = rawService.serviceId;
-                        let rawServiceParts = rawServiceId.split("|");
-
-                        let service = {
-                            serviceUrl: rawServiceParts[0],
-                            serviceName: rawServiceParts.pop()
-                        };
-                        services.push(service);
-                    }
-                }
-                dump(JSON.stringify(services) + '\n');
-                worker.port.emit("servicesChanged", services);
-            }
-        });
-
-        /**
-         * PAUL'S CODE
-         */
-            // periodically advertise registered flyweb services
-        let advertiseRefreshMs = 5000;
-        var periodicAdvertise = function () {
-            DNSSD.advertise();
-            window.setTimeout(periodicAdvertise, advertiseRefreshMs)
-        };
-        window.setTimeout(periodicAdvertise, advertiseRefreshMs);
     }
 });

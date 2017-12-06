@@ -77,6 +77,7 @@ function addGlobalService(service) {
     let [name] = location.split('.');
     let publicService = CI({
         id: serviceId,
+        // TODO (PTC): could add url here as a shortcut!
         name: name,
         http: true
     });
@@ -173,6 +174,19 @@ function discoverNearbyServices(spec) {
                 });
                 AddHandler("serviceLost", serviceListId, message => {
                     let {service} = message;
+                    dump("serviceLost from page-script.js: service " +
+                        JSON.stringify(service) + '\n');
+                    // TODO: whatever cleanup is necessary (removing from services list?)
+                    // let {serviceId} = descriptor;
+                    // services.remove(descriptor);
+                    if (onservicelost) {
+                        try {
+                            onservicelost(CI({serviceId}));
+                        } catch(err) {
+                            dump("Error calling page onservicelost: "
+                                + err.message + "\n" + err.stack + "\n");
+                        }
+                    }
                 });
 
                 try { resolve(result); }
@@ -249,14 +263,28 @@ function publishServerAddOn(name, options) {
                 let {httpServerId} = resp;
 
                 let onrequest = null;
+                let onstop = null;
 
                 let result = CI({
                     name, options,
                     stop: function () {
                         SendRequest("stopServer", {httpServerId}, resp => {});
+                        dump("\n!!!!***!!!!\n\n");
+                        dump("[server.stop] now calling " + onstop.name + "\n");
+                        dump("\n!!!!***!!!!\n\n");
+                        onstop();
+                        dump("\n!!!!***!!!!\n\n");
+                        dump("[server.stop] call to onstop completed successfully!\n");
+                        dump("\n!!!!***!!!!\n\n");
                     },
                     onrequest: function (callback) {
                         onrequest = callback;
+                    },
+                    onstop: function (callback) {
+                        dump("\n!!!!***!!!!\n\n");
+                        dump("Function onstop called with arg " + callback.name + "\n");
+                        dump("\n!!!!***!!!!\n\n");
+                        onstop = callback;
                     }
                 });
 
@@ -421,17 +449,4 @@ function DEF_EVENT_PROP(obj, name, get, set) {
     window.Object.defineProperty(obj, name, CI({get, set}));
 }
 
-/*
-FELIX'S ADD-ON CODE BELOW
- */
-
-let console = content.console;
-
 console.log("== My Flyweb Start ==");
-
-self.port.on("servicesChanged", function(services) {
-    let data = { services: services };
-    content.dispatchEvent(new CustomEvent('flywebServicesChanged', {
-        detail: JSON.stringify(data)
-    }));
-});

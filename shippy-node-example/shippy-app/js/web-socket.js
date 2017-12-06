@@ -10,9 +10,26 @@ var WsOpcodes = {
     Pong: 10
 };
 
+var WsCloseCodes = {
+    Normal: 0x1000,
+    GoingAway: 0x1001,
+    ProtocolErr: 0x1002,
+    UnsupportedDataType: 0x1003
+}
+
+let WS_PING_INTERVAL = 3000;
+let WS_PING_TIMEOUT = 1000;
+
 function Cursor(array) {
     this.array_ = array;
     this.idx_ = 0;
+}
+
+let DEBUG_WS = false;
+function debug(msg, obj) {
+    if (DEBUG_WS) {
+        console.log(msg, obj);
+    }
 }
 
 Cursor.prototype.hasByte = function () {
@@ -42,9 +59,10 @@ Cursor.prototype.splice = function () {
     this.array_.splice(0, this.idx_);
 }
 
-function ServerWebSocket({onerror, onmessage, instream, outstream, headers, stringMessage}) {
+function ServerWebSocket({onerror, onmessage, onclose, instream, outstream, headers, stringMessage}) {
     this.onerror = onerror;
     this.onmessage = onmessage;
+    this.onclose = onclose;
 
     this.stringMessage = stringMessage;
 
@@ -83,25 +101,38 @@ function ServerWebSocket({onerror, onmessage, instream, outstream, headers, stri
     var hashString = Sha1.hashToString(key + WS_ACCEPT_SUFFIX);
     var uuenc = btoa(hashString);
 
-    console.log("Sending uuenc: " + uuenc);
+    debug("Sending uuenc: " + uuenc);
 
     outstream.send("HTTP/1.1 101 Switching Protocols\r\n");
     outstream.send("Upgrade: websocket\r\n");
     outstream.send("Connection: Upgrade\r\n");
     outstream.send("Sec-WebSocket-Accept: " + uuenc + "\r\n");
     outstream.send("\r\n");
+
+    // Make sure the other end is alive
+    this.mostRecentPing = null;
+    setInterval(this.sendPing, WS_PING_INTERVAL, this);
+
 }
 
 ServerWebSocket.prototype.badHeader = function (message) {
-    console.log("Bad header: " + message);
+    debug("Bad header: " + message);
     if (this.onerror) {
         this.onerror("Bad header: " + message);
         return;
     }
 }
 
+ServerWebSocket.prototype.sendPing = function() {
+    // this.sendFrame({opcode: WsOpcodes.Ping, payload: ''});
+    // this.mostRecentPing = setTimeout(function() {
+    //     debug("[WS] Ping timed out, closing connection!");
+    //     this.close();
+    // }, WS_PING_TIMEOUT);
+}
+
 ServerWebSocket.prototype.emitError = function (message) {
-    console.log("Web Socket Error: " + message);
+    console.error("Web Socket Error: " + message);
     if (this.onerror) {
         this.onerror(message);
         return;
@@ -126,7 +157,7 @@ ServerWebSocket.prototype.emitError = function (message) {
  *  Next 4 bytes - Mask.
  */
 ServerWebSocket.prototype.checkInputBuffer = function () {
-    console.log("CheckInputBuffer", this.inputBuffer);
+    debug("CheckInputBuffer", this.inputBuffer);
     var curs = new Cursor(this.inputBuffer);
     if (!curs.hasBytes(2))
         return;
@@ -144,7 +175,7 @@ ServerWebSocket.prototype.checkInputBuffer = function () {
         return;
     }
 
-    console.log("Got bytes", {finBit, opcode, maskBit, payloadSize});
+    debug("Got bytes", {finBit, opcode, maskBit, payloadSize});
 
     if (payloadSize == 126) {
         if (!curs.hasBytes(2))
@@ -162,15 +193,15 @@ ServerWebSocket.prototype.checkInputBuffer = function () {
     if (!curs.hasBytes(4))
         return;
     var maskBytes = curs.readBytes(4);
-    console.log("Got maskBytes", maskBytes);
-    console.log("Cursor", curs);
+    debug("Got maskBytes", maskBytes);
+    debug("Cursor", curs);
 
     // Read payload.
     if (!curs.hasBytes(payloadSize))
         return;
 
     var payload = curs.readBytes(payloadSize);
-    console.log("Got payload", payload);
+    debug("Got payload", payload);
     // Unmask the payload.
     for (var i = 0; i < payload.length; i++) {
         payload[i] ^= maskBytes[i % 4];
@@ -189,6 +220,12 @@ ServerWebSocket.prototype.send = function (data) {
         this.sendFrame({opcode: WsOpcodes.Binary, payload: data});
     }
 };
+
+ServerWebSocket.prototype.close = function () {
+    let closeCode = WsCloseCodes.GoingAway;
+    let message = String.fromCharCode(closeCode);
+    this.sendFrame({opcode: WsOpcodes.Close, payload: message});
+}
 
 ServerWebSocket.prototype.handleFrame = function ({opcode, finBit, payload}) {
     if (!finBit) {
@@ -221,7 +258,14 @@ ServerWebSocket.prototype.handleFrame = function ({opcode, finBit, payload}) {
     }
 
     if (opcode == WsOpcodes.Pong) {
-        // Ignore.
+        clearTimeout(this.mostRecentPing);
+        return;
+    }
+
+    if (opcode == WsOpcodes.Close) {
+        if (this.onclose)
+            this.onclose(payload);
+        return;
     }
 
     // Otherwise, ignore.
@@ -263,5 +307,6 @@ ServerWebSocket.prototype.sendFrame = function ({opcode, payload}) {
 
     // Send frame.
     var frameStr = frame.map(function (i) { return String.fromCharCode(i); }).join('');
+    debug("WS: sending frame: ", frame);
     this.outstream.send(frameStr);
 };

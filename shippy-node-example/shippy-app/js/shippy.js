@@ -5,7 +5,7 @@
  */
 let Shippy = (function() {
 
-	/**
+    /**
 	 * The Shippy environment. This contains the state, the app name and specification, etc.
 	 * This is exposed to other Shippy modules currently with the 'internal' property in the exposed interface.
 	 * It contains single-function getters/setters depending on whether an argument is specified.
@@ -20,9 +20,9 @@ let Shippy = (function() {
 		},
 		currentFlywebService: null,
 		appName: null,
+		appUuid: null,
 		appSpec: null,
-		clientId: null,
-		isConnected: null,
+		clientId: null, // TODO: move state out of here if it is not meant to be synchronized across nodes in the shippy network.
 		initialHtml: null,
 		isServing: null
 	};
@@ -49,6 +49,7 @@ let Shippy = (function() {
 
 	// Register the app
 	function register(appName, appSpec) {
+		Lib.log("SERVER: Registering " + appName);
 		env.appName = appName;
 		env.appSpec = appSpec;
 
@@ -62,6 +63,8 @@ let Shippy = (function() {
 		if (!env.currentFlywebService && shouldBecomeNextServer()) {
 			Shippy.Server.becomeServer();
 		}
+
+        Shippy.SD.start();
 	}
 
 	// Operation calls are actually delegated to the Client module since these are called from clients
@@ -108,13 +111,12 @@ let Shippy = (function() {
 	// Below are single-function getters/setters
 	// ========
 
-	function connected(paramConnected) {
-		if (typeof paramConnected !== 'undefined' && !(env.isConnected === null && paramConnected === false)) {
-			env.isConnected = paramConnected;
-			trigger(paramConnected ? 'connect' : 'disconnect');
-		} else {
-			return env.isConnected;
-		}
+	function onConnect() {
+		trigger('connect');
+	}
+
+	function onDisconnect() {
+		trigger('disconnect');
 	}
 
 	function clientId(paramClientId) {
@@ -150,43 +152,44 @@ let Shippy = (function() {
 		}
 	}
 
-	function currentFlywebService() {
-		return env.currentFlywebService;
+	function currentFlywebService(newValue) {
+		if (typeof newValue !== 'undefined') {
+			env.currentFlywebService = newValue;
+		} else {
+            return env.currentFlywebService;
+        }
 	}
 
 	function initialHtml() {
 		return env.initialHtml;
 	}
 
-	// This is the event that's regularly triggered from our addon. It always contains a list of services with
-	// a serviceName and serviceUrl field.
-	// Unfortunately, this is not always up-to-date, so we are confronted with delays.
-	window.addEventListener('flywebServicesChanged', function(event) {
-		// Reinit to null so if we don't find a service for our app right now we will now
-		console.log("flywebServicesChanged event received in local shippy instance!");
-		env.currentFlywebService = null;
-		if (env.appName) { // If an app was registered
-			let services = JSON.parse(event.detail).services;
-			for (let service of services) {
-				if (service.serviceName === env.appName) { // if this service is for our app
-					env.currentFlywebService = service; // then set it in our env
-				}
-			}
+	function succeedPreviousServer() {
+		Shippy.Server.becomeServer();
+		Shippy.SD.start();
+	}
 
-			// If a service was set and we are not already connected we want to become a client
-			if (env.currentFlywebService && !env.isConnected) {
-				Shippy.Client.becomeClient();
-			}
-			// If (a) there is currently no service for our name
-			// and (b) env.isConnected was set to false before due to a disconnect (initially it was null)
-			// and (c) we should become the next server based on the succ list etc.
-			// then really become the server
-			else if (!env.currentFlywebService && env.isConnected !== null && shouldBecomeNextServer()) {
-				Shippy.Server.becomeServer();
-			}
-		}
-		Lib.log('Current Flyweb Service: ' + JSON.stringify(env.currentFlywebService));
-	});
+    /**
+     * Make sure this is only ever triggered if we're absolutely sure that the lost connection
+     * is unrecoverable (i.e. it isn't just a temporary blip in connectivity).
+	 *
+	 * Also, should only ever be triggered for a client that has had a connection at some point
+	 * in the past (not suitable to be called by a new client that's never been connected, since
+	 * it's possible a new server is started here).
+     */
+    function onConnectionLost() {
+        onDisconnect();
+        Shippy.SD.resetConnectionState();
+        if (shouldBecomeNextServer()) {
+            succeedPreviousServer();
+        }
+        else {
+            Shippy.SD.start();
+            // May as well start our own server, since we've been connected in the past, and therefore have
+            // a client id, some version of the state, etc.
+            Shippy.SD.onTimeout(succeedPreviousServer);
+        }
+    }
 
 	// When the document has loaded, we save the initial HTML such that it can be served by our Flyweb server.
 	window.onload = function() {
@@ -204,7 +207,6 @@ let Shippy = (function() {
 			addSuccessor: addSuccessor,
 			removeSuccessor: removeSuccessor,
 			clearSuccessors: clearSuccessors,
-			connected: connected,
 			clientId: clientId,
 			appName: appName,
 			appSpec: appSpec,
@@ -212,8 +214,12 @@ let Shippy = (function() {
 			currentFlywebService: currentFlywebService,
 			initialHtml: initialHtml,
 			serving: serving,
-			shouldBecomeNextServer: shouldBecomeNextServer
+			onConnectionLost: onConnectionLost,
+			onConnect: onConnect,
+			onDisconnect: onDisconnect
 		}
 	};
 
 }());
+
+// $(document).ready(Shippy.internal.startServiceDiscovery);
