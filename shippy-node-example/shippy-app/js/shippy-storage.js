@@ -65,10 +65,10 @@ Shippy.Storage = (function() {
 
 					try {
 						sessionStorage.setItem(key, JSON.stringify(data));
-						Lib.log('File successfully added to session storage', key);
+						// Shippy.Util.log('File successfully added to session storage', key);
 					}
 					catch (e) {
-						Lib.log("Storage failed: ", e);
+						Shippy.Util.log("Storage failed: ", e);
 					}
 				};
 				fileReader.readAsText(xhr.response);
@@ -129,9 +129,9 @@ Shippy.Storage = (function() {
 		let content = Shippy.internal.initialHtml();
 		let data = {mimeType: extToMimes.html, content: content};
 		sessionStorage.setItem('/', JSON.stringify(data));
-		Lib.log('File successfully added to session storage', '/');
+		// Shippy.Util.log('File successfully added to session storage', '/');
 		sessionStorage.setItem('/index.html', JSON.stringify(data));
-		Lib.log('File successfully added to session storage', '/index.html');
+		// Shippy.Util.log('File successfully added to session storage', '/index.html');
 	}
 
 	function init() {

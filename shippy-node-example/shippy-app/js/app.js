@@ -10,13 +10,19 @@
 	// It's easiest to always build the UI from the current state
 	function updateUi(state) {
 		$('#state').text(JSON.stringify(state));
+		$("#myID").text(Shippy.internal.clientId());
+		$("#server").text(Shippy.internal.serving());
+		$("#next").text(Shippy.internal.shouldBecomeNextServer());
+		let url = Shippy.internal.currentFlywebService() ? Shippy.internal.currentFlywebService().serviceUrl : "#";
+		$("#url").text('http://' + url);
+		$("#url").attr("href", 'http://' + url);
 	}
 
 	// This function will be called from Shippy upon initializing the app
 	// The app hereby tells Shippy what the initial state should look like
 	let init = function(state) {
 		state.queue = [];
-		Lib.log("init called. State is now...", state);
+		Shippy.Util.log("init called. State is now...", state);
 		updateUi(state);
 	};
 
@@ -43,20 +49,20 @@
 
 	// Whenever the state is updated, I want to update my UI
 	Shippy.on("stateupdate", function(state) {
-		Lib.log("App event received: stateupdate");
+		Shippy.Util.log("App event received: stateupdate");
 		updateUi(state);
 	});
 
 	// My app is now connected. Show a green box.
 	Shippy.on("connect", function() {
-		Lib.log("App event received: connect");
+		Shippy.Util.log("App event received: connect");
 		$('#connection-status').addClass('connected');
 
 	});
 
 	// My app is now disconnected. Show a red box.
 	Shippy.on("disconnect", function(state) {
-		Lib.log("App event received: disconnect");
+		Shippy.Util.log("App event received: disconnect");
 		$('#connection-status').removeClass('connected');
 	});
 
@@ -64,13 +70,13 @@
 	// as the payload.
 	function onAddClick(e) {
 		e.preventDefault();
-		Shippy.call("add", { name: myName });
+		Shippy.call("add", { name: myName, data: Shippy.Util.randomPayload() });
 	}
 
 	// Same for the remove button
 	function onRemoveClick(e) {
 		e.preventDefault();
-		Shippy.call("remove", { name: myName });
+		Shippy.call("remove", { name: myName, data: Shippy.Util.randomPayload() });
 	}
 
 	// When the document is ready I want to tell the queue app my name such that it knows

@@ -3,29 +3,40 @@
  */
 Shippy.Client = (function() {
 
-    // Our (single) WS connection.
-    let ws;
+	// Our (single) WS connection.
+	let ws;
+
+	let tempID; // temp ID while server does not assign an ID to this client
 
 	// Our routes for messages received from the server. These will be called from WS message events.
 	let routes = {
 		// The server accepted us and gave us a clientId. We want to save this so we will know when we should
 		// become the next server depending on the succ list.
 		welcome: function(body) {
-			Lib.log("Client route 'welcome' called", body);
+			Shippy.Util.log("Client route 'welcome' called", body);
 			Shippy.internal.clientId(body.clientId);
+			Trace.log({
+				timestamp: Date.now(),
+				event: 'shippy_client_received_welcome',
+				source: Shippy.internal.clientId(),
+				from: tempID,
+				pkgSize: Shippy.Util.payloadSize(body)
+			});
 			if (Shippy.internal.serving()) {
 				// If we have the double role, we should tell the server such that he removes us from the
 				// succ list.
-				Lib.wsSend(ws, "_revealdoublerole", {clientId: body.clientId});
+				Shippy.Util.wsSend(ws, "_revealdoublerole", {clientId: body.clientId});
 			}
+			Shippy.internal.trigger("clientid", { serving: Shippy.internal.serving(), clientId: body.clientId });
 		},
 		// The state was updated. If we don't have the double role we need to tell Shippy to update it's state.
 		stateupdate: function(body) {
-			Lib.log("Client route 'stateupdate' called", body);
+			Shippy.Util.log("Client route 'stateupdate' called", body);
+			Trace.log({ timestamp: Date.now(), event: 'shippy_client_received_stateupdate', source: Shippy.internal.clientId(), pkgSize: Shippy.Util.payloadSize(body), numSuccessors: Shippy.internal.state().successors.length, isBroadcast: typeof body.state !== 'undefined'
+			});
 
 			if (!Shippy.internal.serving()) {
-				let updateFunc = getUpdateFunc(body);
-				updateState(isServerAhead(body), updateFunc);
+				updateState(body);
 			}
 			Shippy.internal.trigger("stateupdate", Shippy.internal.state());
 		}
@@ -38,71 +49,68 @@ Shippy.Client = (function() {
         return currentVersion <= serverVersion;
     }
 
-    // Check if the payload carries the entire update or just an operation.
-    // Based on that, this function creates an update function callback that will be used to update the client state
-    // The callback either overrides the entire state, or updates the state/version based on a registered operation
-	function getUpdateFunc(body) {
-		if (typeof body.state !== 'undefined') {
-			return function () {
-                Shippy.internal.state(body.state);
-            };
-		}
-		return function () {
-            routes[body.route] && routes[body.route](Shippy.internal.state(), body.payload);
-            Shippy.internal.updateVersion(body.version);
-        };
-    }
-
     // it will check whether the server has a state newer then the client
     // If it does, it will apply the state update function
     // Otherwise, it will send a _mostuptodate message back to the server
-    function updateState(isServerAhead, updateFunc) {
-        if (isServerAhead){
-            updateFunc();
+    function updateState(body) {
+    	let currentState = Shippy.internal.state();
+        if (isServerAhead(body)){
+        	if (body.state) {
+		        Shippy.internal.state(body.state);
+	        } else if (typeof body.version === 'number' && body.payload && body.route && routes[body.route]) {
+		        routes[body.route](currentState, body.payload);
+		        Shippy.internal.updateVersion(body.version);
+	        } else {
+        		Shippy.Util.log("Error in updateState", body);
+	        }
         } else {
-            Lib.wsSend(ws, "_mostuptodate", {state: Shippy.internal.state()});
+            Shippy.Util.wsSend(ws, "_mostuptodate", {state: currentState});
         }
     }
 
     // Become a Shippy client. When this is called there must be already a current Flyweb service available
     // and its URL will be used for the WS connection.
     function becomeClient() {
+	    tempID = Date.now();
+	    Trace.log({ timestamp: Date.now(), event: 'shippy_become_client_begin', source: tempID});
         // Mount the routes for the app operations onto our WS routes.
         // This is necessary in the client because state updates may carry operations rather than the entire state
         routes = Object.assign(routes, Shippy.internal.appSpec().operations);
-
+		Shippy.Util.log("BECOME CLIENT");
         ws = new WebSocket("ws://" + Shippy.internal.currentFlywebService().serviceUrl);
 
         // Tell shippy that we are now connected.
         ws.addEventListener("open", function(e) {
-            Lib.log("CLIENT: OPEN");
+            Shippy.Util.log("CLIENT: OPEN");
             Shippy.internal.connected(true);
         });
 
         // Delegate a received message to the associated route.
         ws.addEventListener("message", function(e) {
-            Lib.log("CLIENT: MESSAGE");
-            let data = Lib.wsReceive(e);
+            Shippy.Util.log("CLIENT: MESSAGE");
+            let data = Shippy.Util.wsReceive(e);
             routes[data.route] && routes[data.route](data.body);
         });
 
         // Tell shippy that we are now disconnected.
         ws.addEventListener("close", function(e) {
-            Lib.log("CLIENT: CLOSE");
+            Shippy.Util.log("CLIENT: CLOSE");
             Shippy.internal.connected(false);
         });
 
         // Don't really know what to do here
         ws.addEventListener("error", function(e) {
-            Lib.log("CLIENT: ERROR");
+            Shippy.Util.log("CLIENT: ERROR");
         });
+	    Trace.log({ timestamp: Date.now(), event: 'shippy_become_client_end', source: Shippy.internal.clientId()});
     }
 
     // We as client are responsible for calling the app operations. Essentially this will become
     // messages on our WS connection. Then on the server, the associated operations will be called with the
     // current state and the params below as arguments.
     function call(operationName, params) {
-        Lib.wsSend(ws, operationName, params);
+	    Trace.log({ timestamp: Date.now(), event: 'shippy_client_call_' + operationName, source: Shippy.internal.clientId()});
+        Shippy.Util.wsSend(ws, operationName, params);
     }
 
     // Interface exposed as Shippy.Client

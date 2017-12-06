@@ -3,6 +3,9 @@ node_modules/
 .idea/
 **/.idea/
 # BEGIN: Paper/Latex stuff
+shippy-measurement/output/
+shippy-measurement/input/
+
 
 *.acn
 *.acr
