@@ -14,8 +14,9 @@ Shippy.Server = (function() {
 		// We don't want the client that is also the server in our successor list because when the server dies
 		// this client dies too.
 		_revealdoublerole: function (state, params) {
-			Lib.log("Double role revealed: ", params.clientId);
+			Shippy.Util.log("Double role revealed: ", params.clientId);
 			Shippy.internal.removeSuccessor(params.clientId);
+			broadcastState();
 			// Should we trigger a broadcast here? I think I will always be the first client when I reveal
 			// myself but I'm not really sure.
 		},
@@ -24,7 +25,7 @@ Shippy.Server = (function() {
 			// In that case, the server needs to make a copy of his list of successors and then, update the state based on what he received from the client
 			// This is not optimal. Ideally, instead of sending the most up-to-date state,
 			// the client sends missing operations that need to be added such that the server can reconstruct his state
-			Lib.log("Upon new connection, a client had the most up-to-date state", params.clientId);
+			Shippy.Util.log("Upon new connection, a client had the most up-to-date state", params.clientId);
 			Shippy.internal.updateStateKeepSuccessors(params);
 		}
 	};
@@ -43,7 +44,7 @@ Shippy.Server = (function() {
 	}
 
 	function onFetch(event) {
-		Lib.log("ONFETCH");
+		Shippy.Util.log("ONFETCH");
 		let url = event.request.url;
 		let file = Shippy.Storage.get(url);
 		if (file) {
@@ -57,7 +58,7 @@ Shippy.Server = (function() {
 	// Run through all WS connections and send the state.
 	function broadcastState() {
 		for (let clientId in wss) {
-			Lib.wsSend(wss[clientId], "stateupdate", {state: Shippy.internal.state()});
+			Shippy.Util.wsSend(wss[clientId], "stateupdate", {state: Shippy.internal.state()});
 		}
 	}
 
@@ -67,7 +68,7 @@ Shippy.Server = (function() {
 			let dest = wss[clientId];
 			data.origin = ws === dest;
 
-			Lib.wsSend(dest, "stateupdate", data);
+			Shippy.Util.wsSend(dest, "stateupdate", data);
 		}
 	}
 
@@ -75,7 +76,7 @@ Shippy.Server = (function() {
 	function onWebsocket(event) {
 		let ws = event.accept(); // just accept all connections
 
-		Lib.log("SERVER: INITIAL");
+		Shippy.Util.log("SERVER: INITIAL");
 
 
 		// Open is the event when a the connection for a client is opened.
@@ -84,21 +85,26 @@ Shippy.Server = (function() {
 		// _revealdoublerole route is called from this client). We send a welcome message to the client containing
 		// the clientId. We also broadcast the state because the contained successor list changed.
 		ws.addEventListener("open", function(e) {
-			Lib.log("SERVER: OPEN");
+			Shippy.Util.log("SERVER: OPEN");
 			let clientId = new Date().getTime();
 			ws.clientId = clientId;
 			wss[clientId] = ws;
+			Trace.log({ timestamp: Date.now(), event: 'shippy_server_ws_open', source: Shippy.internal.clientId(), from: ws.clientId});
 			Shippy.internal.addSuccessor(clientId);
-			Lib.wsSend(ws, "welcome", {clientId: clientId});
+			Shippy.Util.wsSend(ws, "welcome", {clientId: clientId});
 			broadcastState();
 		});
 
 		// Whenever the server receives a message it calls the associated route that's extracted from the payload.
 		// The route will either be a mounted on from the app operations or a private _ one (e.g. _revealdoublerole).
 		ws.addEventListener("message", function(e) {
-			Lib.log("SERVER: MESSAGE");
-			let data = Lib.wsReceive(e);
+			Shippy.Util.log("SERVER: MESSAGE");
+			let data = Shippy.Util.wsReceive(e);
 			let currentState = Shippy.internal.state();
+
+			if (ws.clientId){
+				Trace.log({ timestamp: Date.now(), event: 'shippy_server_received_'+data.route, source: Shippy.internal.clientId(), from: ws.clientId, pkgSize: Shippy.Util.payloadSize(data)});
+			}
 
 			routes[data.route] && routes[data.route](currentState, data.body);
 
@@ -117,8 +123,9 @@ Shippy.Server = (function() {
 
 		// When a client closed the connection we remove it from the succ list and broadcast the state.
 		ws.addEventListener("close", function(e) {
-			Lib.log("SERVER: CLOSE");
+			Shippy.Util.log("SERVER: CLOSE");
 			if (ws.clientId) {
+				Trace.log({ timestamp: Date.now(), event: 'shippy_server_ws_close', source: Shippy.internal.clientId(), from: ws.clientId});
 				delete wss[ws.clientId];
 				Shippy.internal.removeSuccessor(ws.clientId);
 				broadcastState();
@@ -127,23 +134,25 @@ Shippy.Server = (function() {
 
 		// Don't really know what to do here
 		ws.addEventListener("error", function(e) {
-			Lib.log("SERVER: ERROR");
+			Shippy.Util.log("SERVER: ERROR");
 		});
 
 	}
 
 	// Don't really know what to do here
 	function onClose() {
-		Lib.log("ON CLOSE");
+		Shippy.Util.log("ON CLOSE");
+		Trace.log({ timestamp: Date.now(), event: 'shippy_server_disconnecting', source: Shippy.internal.clientId()});
 	}
 
 	function becomeServer() {
+		Trace.log({ timestamp: Date.now(), event: 'shippy_become_server_begin', source: Shippy.internal.clientId()});
 		// Mount the routes for the app operations onto our WS routes.
 		routes = Object.assign(routes, Shippy.internal.appSpec().operations);
-		Lib.log("BECOME SERVER");
+		Shippy.Util.log("BECOME SERVER");
 		// Now REALLY become the server!
 		navigator.publishServer(Shippy.internal.appName()).then(function(server) {
-			Lib.log("New Server created for app:", Shippy.internal.appName());
+			Shippy.Util.log("New Server created for app:", Shippy.internal.appName());
 			// When we have a new server we want to start with a fresh succ list.
 			Shippy.internal.clearSuccessors();
 			// Indicate that we are now the serving node.
@@ -151,9 +160,11 @@ Shippy.Server = (function() {
 			server.onfetch = onFetch;
 			server.onwebsocket = onWebsocket;
 			server.onclose = onClose;
-			Lib.log(server);
+			Shippy.Util.log(server);
+			Trace.log({ timestamp: Date.now(), event: 'shippy_become_server_end', source: Shippy.internal.clientId()});
 		}).catch(function (err) {
-			Lib.log("Error creating server", err);
+			Shippy.Util.log("Error creating server", err);
+			Trace.log({ timestamp: Date.now(), event: 'shippy_become_server_error', source: Shippy.internal.clientId()});
 		});
 	}
 

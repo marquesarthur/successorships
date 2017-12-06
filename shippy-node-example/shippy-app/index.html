@@ -16,13 +16,21 @@
         <a id="remove-button" href="#">Remove</a>
         <div id="connection-status">Connected?</div>
     </div>
+    <hr>
+    <div>
+        <div>myID: <span id="myID"></span></div>
+        <div>Server: <span id="server"></span></div>
+        <div>Next: <span id="next"></span></div>
+        <div>URL: <a id="url" href="" target="_blank">NONE</a></div>
+    </div>
 
     <!-- Just for some DOM manipulation because I'm fast with jQuery -->
     <script src="js/jquery.js"></script>
-    <!-- Just a static util library that can be used by all Shippy modules -->
-    <script src="js/lib.js"></script>
+    <script src="js/shippy-trace.js"></script>
     <!-- The Shippy library hub -->
     <script src="js/shippy.js"></script>
+    <!-- Just a static util library that can be used by all Shippy modules -->
+    <script src="js/shippy-util.js"></script>
     <!-- Only Shippy session storage stuff -->
     <script src="js/shippy-storage.js"></script>
     <!-- Only Shippy server related stuff -->
