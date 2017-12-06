@@ -3,8 +3,8 @@ node_modules/
 .idea/
 **/.idea/
 # BEGIN: Paper/Latex stuff
-shippy-measurement/output/
-shippy-measurement/input/
+shippy-measurement/output/*.json
+shippy-measurement/input/*.json
 
 
 *.acn
