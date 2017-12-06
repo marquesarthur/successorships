@@ -75,7 +75,7 @@ let Shippy = (function() {
 
 	// Operation calls are actually delegated to the Client module since these are called from clients
 	function call(operationName, params) {
-		Lib.log('Operation called: ' + operationName + '; params:', params);
+		Shippy.Util.log('Operation called: ' + operationName + '; params:', params);
 		Shippy.Client.call(operationName, params);
 	}
 
@@ -94,10 +94,10 @@ let Shippy = (function() {
 		} else { // If there are successors, check if I'm the first one
 			should = successors[0] === env.clientId;
 		}
-		Lib.log('Should become server? ' + should);
+		Shippy.Util.log('Should become server? ' + should);
 		return should;
 	}
-	
+
 	function updateStateKeepSuccessors(params) {
 		// TODO: change from overriding the entire state to reconstructing the state based on a set of operations
 		let successors = env.state.successors;
@@ -142,7 +142,8 @@ let Shippy = (function() {
 	function pruneUnreachableSuccessor() {
 		if (!env.currentFlywebService && !env.isConnected) {
 			if (waitingTime <= 0 && env.state.successors[0] !== env.clientId) {
-				Lib.log('A successor is unreachable after T seconds. Removing first successor from the successor list', env.state.successors);
+				Shippy.Util.log('A successor is unreachable after T seconds. Removing first successor from the successor list', env.state.successors);
+				Trace.log({ timestamp: Date.now(), event: 'shippy_client_prune_successor', source: clientId()});
 				env.state.successors.splice(0, 1);
 				resetWaitingTime();
 
@@ -179,7 +180,7 @@ let Shippy = (function() {
 			env.serving = paramServing;
 			$('html').attr('data-flyweb-role', serving ? 'server' : 'client');
 		} else {
-			return env.serving;
+			return !!env.serving;
 		}
 	}
 
@@ -225,6 +226,7 @@ let Shippy = (function() {
 			let services = JSON.parse(event.detail).services;
 			for (let service of services) {
 				if (service.serviceName === env.appName) { // if this service is for our app
+					trigger("servicefound", service);
 					env.currentFlywebService = service; // then set it in our env
 				}
 			}
@@ -249,13 +251,18 @@ let Shippy = (function() {
 				pruneUnreachableSuccessor();
 			}
 		}
-		Lib.log('Current Flyweb Service: ' + JSON.stringify(env.currentFlywebService));
+		Shippy.Util.log('Current Flyweb Service: ' + JSON.stringify(env.currentFlywebService));
 	});
 
 	// When the document has loaded, we save the initial HTML such that it can be served by our Flyweb server.
 	window.onload = function () {
 		env.initialHtml = '<html data-flyweb-role="client">' + $('html').html() + '</html>';
 		Shippy.Storage.init(); // Get files required to run this app and add them to the session storage.
+	};
+
+	window.onbeforeunload = function (e) {
+		Trace.log({ timestamp: Date.now(), event: 'disconnecting', source: clientId(), isServer: serving() });
+		Trace.save();
 	};
 
 	// This will be the exposed interface. The global Shippy object.

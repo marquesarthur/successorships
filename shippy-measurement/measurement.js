@@ -3,7 +3,7 @@ let {Analysis} = require('./analysis/analysis');
 console.log('Starting measurements...');
 
 console.log('Clustering events...');
-let log = Analysis.aggregate('./sample');
+let log = Analysis.aggregate('./sample/input');
 
 console.log('Generating csv entries...');
 Analysis.getEvents(log, './output');

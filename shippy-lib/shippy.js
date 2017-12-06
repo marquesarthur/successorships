@@ -143,7 +143,7 @@ let Shippy = (function() {
 		if (!env.currentFlywebService && !env.isConnected) {
 			if (waitingTime <= 0 && env.state.successors[0] !== env.clientId) {
 				Shippy.Util.log('A successor is unreachable after T seconds. Removing first successor from the successor list', env.state.successors);
-				Lib.trace({ timestamp: Date.now(), event: 'shippy_client_prune_successor', source: clientId()});
+				Trace.log({ timestamp: Date.now(), event: 'shippy_client_prune_successor', source: clientId()});
 				env.state.successors.splice(0, 1);
 				resetWaitingTime();
 
@@ -261,8 +261,8 @@ let Shippy = (function() {
 	};
 
 	window.onbeforeunload = function (e) {
-		Shippy.Trace.log({ timestamp: Date.now(), event: 'disconnecting', source: clientId(), isServer: serving() });
-		Shippy.Trace.save();
+		Trace.log({ timestamp: Date.now(), event: 'disconnecting', source: clientId(), isServer: serving() });
+		Trace.save();
 	};
 
 	// This will be the exposed interface. The global Shippy object.
