@@ -1,13 +1,13 @@
-var app = angular.module('queueApp', []);
+let app = angular.module('queueApp', []);
 
 app.service('QueueService', function () {
 
-    var randonNames = [
+	let randonNames = [
         'John Snow', 'Homer Simpson', 'Samus Aran', 'Daenerys Targerian', 'Patrick Kvothe', 'Nadine',
         'Ned Stark', 'Bart Simpson', 'Billy', 'The Grim Reaper', 'Foo', 'Bar'
     ];
 
-    var randonIds = [
+	let randonIds = [
         'cs12311', 'cs12312', 'cs12313', 'cs12314', 'cs12315', 'cs12316',
         'cec5341', 'cec5342', 'cec5343', 'cec5344', 'cec5345', 'cec5346'
     ];
@@ -38,10 +38,12 @@ app.controller('QueueCtrl', ['$scope', 'QueueService', function ($scope, QueueSe
 	$scope.url = "#";
 
     $scope.add = function () {
+	    $scope.me.data = Shippy.Util.randomPayload();
         Shippy.call("add", $scope.me);
     };
 
     $scope.remove = function () {
+	    $scope.me.data = Shippy.Util.randomPayload();
         Shippy.call("remove", $scope.me);
     };
 
@@ -71,8 +73,8 @@ app.controller('QueueCtrl', ['$scope', 'QueueService', function ($scope, QueueSe
     let operations = {
         add: function(state, params) {
             params.status = 'waiting';
-            var index = -1;
-            for (var i = 0; i < state.queue.length; i++) {
+	        let index = -1;
+            for (let i = 0; i < state.queue.length; i++) {
                 if (state.queue[i].id === params.id){
                     index = i;
                     break;
@@ -84,8 +86,8 @@ app.controller('QueueCtrl', ['$scope', 'QueueService', function ($scope, QueueSe
             }
         },
         remove: function(state, params) {
-            var index = -1;
-            for (var i = 0; i < state.queue.length; i++) {
+	        let index = -1;
+            for (let i = 0; i < state.queue.length; i++) {
                 if (state.queue[i].id === params.id){
                     index = i;
                     break;
@@ -112,6 +114,7 @@ app.controller('QueueCtrl', ['$scope', 'QueueService', function ($scope, QueueSe
     Shippy.on("connect", function() {
 	    Shippy.Util.log("App event received: connect");
         $scope.serverRunning = true;
+	    $scope.$apply();
 
     });
 
@@ -119,5 +122,6 @@ app.controller('QueueCtrl', ['$scope', 'QueueService', function ($scope, QueueSe
     Shippy.on("disconnect", function(state) {
 	    Shippy.Util.log("App event received: disconnect");
         $scope.serverRunning = false;
+	    $scope.$apply();
     });
 }]);
