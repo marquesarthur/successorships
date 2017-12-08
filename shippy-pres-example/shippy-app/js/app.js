@@ -1,7 +1,7 @@
 (function() {
 
 	let revealInitialized = false;
-	let lastSlideChange = 0;
+	let lastSetRevealStateCall = 0;
 
 	let randonNames = ['John', 'Homer', 'Samus', 'Daenerys', 'Patrick', 'Nadine', 'Ned', 'Bart', 'Billy', 'Grim', 'Foo', 'Bar'];
 
@@ -39,7 +39,6 @@
 
 	let operations = {
 		setRevealState: function(appState, params) {
-			lastSlideChange = new Date().getTime();
 			appState.revealState = params.revealState;
 		},
 		addName: function(appState, params) {
@@ -118,9 +117,10 @@
 			]
 		});
 		Reveal.addEventListener('slidechanged', function(event) {
-			if (new Date().getTime() - lastSlideChange > 500) {
+			if (new Date().getTime() - lastSetRevealStateCall > 300) {
 				let revealState = Reveal.getState();
 				Shippy.call("setRevealState", { revealState: revealState });
+				lastSetRevealStateCall = new Date().getTime();
 			} else {
 				Shippy.Util.log("SLIDECHANGE IGNORED");
 			}
