@@ -16,7 +16,8 @@ let Shippy = (function() {
 	 */
 	let env = {
 		state: {
-			successors: []
+			successors: [],
+			version: 0,
 		},
 		currentFlywebService: null,
 		appName: null,
@@ -26,6 +27,14 @@ let Shippy = (function() {
 		initialHtml: null,
 		isServing: null
 	};
+
+	const time = {
+		defaultWaitingTime: 21000,
+		minDecrementTime: 1000,
+		maxDecrementTime: 4000
+	};
+
+	let waitingTime = time.defaultWaitingTime;
 
 	// Listeners registered via Shippy.on(...)
 	let listeners = {};
@@ -66,7 +75,7 @@ let Shippy = (function() {
 
 	// Operation calls are actually delegated to the Client module since these are called from clients
 	function call(operationName, params) {
-		Lib.log('Operation called: ' + operationName + '; params:', params);
+		Shippy.Util.log('Operation called: ' + operationName + '; params:', params);
 		Shippy.Client.call(operationName, params);
 	}
 
@@ -85,8 +94,15 @@ let Shippy = (function() {
 		} else { // If there are successors, check if I'm the first one
 			should = successors[0] === env.clientId;
 		}
-		Lib.log('Should become server? ' + should);
+		Shippy.Util.log('Should become server? ' + should);
 		return should;
+	}
+
+	function updateStateKeepSuccessors(params) {
+		// TODO: change from overriding the entire state to reconstructing the state based on a set of operations
+		let successors = env.state.successors;
+		Object.assign(env.state, params.state);
+		env.state.successors = successors;
 	}
 
 	function addSuccessor(successor) {
@@ -103,6 +119,40 @@ let Shippy = (function() {
 	function clearSuccessors() {
 		env.state.successors = [];
 	}
+
+	function resetWaitingTime() {
+		waitingTime = time.defaultWaitingTime;
+	}
+
+	function updateVersion(version) {
+		if (version){
+			env.state.version = version;
+		} else {
+			env.state.version++;
+		}
+	}
+
+	// Random number in the interval of [1000 ms to 4000ms]
+	// Such that clients can try to become the next server and drop elements from the list faster than others
+	function decrementTime() {
+		return Math.random() * (time.maxDecrementTime - time.minDecrementTime) + time.minDecrementTime;
+	}
+
+	// Remove the first successor of the successors list if this successor does not become the new server after T seconds
+	function pruneUnreachableSuccessor() {
+		if (!env.currentFlywebService && !env.isConnected) {
+			if (waitingTime <= 0 && env.state.successors[0] !== env.clientId) {
+				Shippy.Util.log('A successor is unreachable after T seconds. Removing first successor from the successor list', env.state.successors);
+				Trace.log({ timestamp: Date.now(), event: 'shippy_client_prune_successor', source: clientId()});
+				env.state.successors.splice(0, 1);
+				resetWaitingTime();
+
+			} else {
+				waitingTime -= decrementTime();
+			}
+		}
+	}
+
 
 	// ========
 	// Below are single-function getters/setters
@@ -130,7 +180,7 @@ let Shippy = (function() {
 			env.serving = paramServing;
 			$('html').attr('data-flyweb-role', serving ? 'server' : 'client');
 		} else {
-			return env.serving;
+			return !!env.serving;
 		}
 	}
 
@@ -158,22 +208,32 @@ let Shippy = (function() {
 		return env.initialHtml;
 	}
 
+	function version() {
+		return env.state.version;
+	}
+
+	// ========
+	// Below is the mDNS service discovery listener
+	// ========
+
 	// This is the event that's regularly triggered from our addon. It always contains a list of services with
 	// a serviceName and serviceUrl field.
 	// Unfortunately, this is not always up-to-date, so we are confronted with delays.
-	window.addEventListener('flywebServicesChanged', function(event) {
+	window.addEventListener('flywebServicesChanged', function (event) {
 		// Reinit to null so if we don't find a service for our app right now we will now
 		env.currentFlywebService = null;
 		if (env.appName) { // If an app was registered
 			let services = JSON.parse(event.detail).services;
 			for (let service of services) {
 				if (service.serviceName === env.appName) { // if this service is for our app
+					trigger("servicefound", service);
 					env.currentFlywebService = service; // then set it in our env
 				}
 			}
 
 			// If a service was set and we are not already connected we want to become a client
 			if (env.currentFlywebService && !env.isConnected) {
+				resetWaitingTime();
 				Shippy.Client.becomeClient();
 			}
 			// If (a) there is currently no service for our name
@@ -181,15 +241,28 @@ let Shippy = (function() {
 			// and (c) we should become the next server based on the succ list etc.
 			// then really become the server
 			else if (!env.currentFlywebService && env.isConnected === false && shouldBecomeNextServer()) {
+				resetWaitingTime();
 				Shippy.Server.becomeServer();
 			}
+			// If I' neither the next server, nor I'm connected I need to keep track of probable unreachable successors
+			// If after some time period now successor has assumed the server role, I need to update my successor list
+			// At some point, I'll be the next server, thus recovering from a chain of consecutive disconnections
+			else if (!env.currentFlywebService && !env.isConnected) {
+				pruneUnreachableSuccessor();
+			}
 		}
-		Lib.log('Current Flyweb Service: ' + JSON.stringify(env.currentFlywebService));
+		Shippy.Util.log('Current Flyweb Service: ' + JSON.stringify(env.currentFlywebService));
 	});
 
 	// When the document has loaded, we save the initial HTML such that it can be served by our Flyweb server.
-	window.onload = function() {
-		env.initialHtml = '<html data-flyweb-role="client">'+$('html').html()+'</html>';
+	window.onload = function () {
+		env.initialHtml = '<html data-flyweb-role="client">' + $('html').html() + '</html>';
+		Shippy.Storage.init(); // Get files required to run this app and add them to the session storage.
+	};
+
+	window.onbeforeunload = function (e) {
+		Trace.log({ timestamp: Date.now(), event: 'disconnecting', source: clientId(), isServer: serving() });
+		Trace.save();
 	};
 
 	// This will be the exposed interface. The global Shippy object.
@@ -199,15 +272,18 @@ let Shippy = (function() {
 		on: on,
 		call: call,
 		internal: {
+			updateVersion: updateVersion,
 			trigger: trigger,
 			addSuccessor: addSuccessor,
 			removeSuccessor: removeSuccessor,
 			clearSuccessors: clearSuccessors,
 			connected: connected,
 			clientId: clientId,
+			version: version,
 			appName: appName,
 			appSpec: appSpec,
 			state: state,
+			updateStateKeepSuccessors: updateStateKeepSuccessors,
 			currentFlywebService: currentFlywebService,
 			initialHtml: initialHtml,
 			serving: serving,
