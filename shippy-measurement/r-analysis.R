@@ -8,11 +8,12 @@ require("effsize")
 ####################################################################################################
 
 # Change this line to your own path successorships path
-# setwd('/Users/Arthur/Workspace/successorships')
+# setwd('/Users/Arthur/Workspace/cpsc527-development/measurement/successorships')
 
 serverRecovery <- read.csv(file="./shippy-measurement/output/serverRecovery.csv", head=TRUE, sep=",")
 clientWelcome <- read.csv(file="./shippy-measurement/output/clientWelcome.csv", head=TRUE, sep=",")
 messageRTT <- read.csv(file="./shippy-measurement/output/messageRTT.csv", head=TRUE, sep=",")
+stateConvergence <- read.csv(file="./shippy-measurement/output/stateConvergence.csv", head=TRUE, sep=",")
 
 mean(serverRecovery$time)
 
@@ -41,5 +42,14 @@ p <- p + labs(y = 'cdf')
 p
 
 pdf("./shippy-measurement/graphs/messageRTT.pdf")
+print(p)
+dev.off()
+
+p <- ggplot(stateConvergence, aes(time)) + stat_ecdf(geom = "step")
+p <- p + labs(x = 'State Recovery (s)')
+p <- p + labs(y = 'cdf')
+p
+
+pdf("./shippy-measurement/graphs/stateConvergence.pdf")
 print(p)
 dev.off()

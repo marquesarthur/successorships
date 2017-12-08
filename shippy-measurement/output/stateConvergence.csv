@@ -1,0 +1,4 @@
+event,operation,time,pkgSize,numSuccessors,version
+convergence,add,0.009,147,1,1
+convergence,add,0.008,87,1,2
+convergence,add,0.043,65612,2,3
