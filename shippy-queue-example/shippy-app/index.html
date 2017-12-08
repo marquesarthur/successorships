@@ -40,6 +40,12 @@
                     <!--will appear once a TA is apple to help you. Remember to ENABLE desktop notifications!</p>-->
 
                 <button id="enableButton" type="button" class="btn btn-default"><span>Enable Notifications</span></button>
+
+                <div class="pull-right">
+                    <button type="button" class="btn btn-danger" ng-click=remove()><span>Leave Queue</span></button>
+
+                    <button type="button" class="btn btn-success" ng-click=add()><span>Join Queue</span></button>
+                </div>
             </div>
         </div>
 
@@ -70,11 +76,6 @@
                         <span ng-if="student.status == 'waiting'" ><small>Waiting</small></span>
                         <span ng-if="student.status == 'being_helped'" ><small>TA NAME here</small></span>
                         <span ng-if="student.status == 'helped'" ><small>Helped</small></span>
-
-                        <div class="btn-group-sm pull-right">
-                            <button type="button" class="btn btn-primary" ng-click="notify($index)"><span><small>helping</small></span></button>
-                            <button type="button" class="btn btn-success"  ng-click="remove($index)"><span><small>dequeue</small></span></button>
-                        </div>
                     </td>
                 </tr>
                 </tbody>
