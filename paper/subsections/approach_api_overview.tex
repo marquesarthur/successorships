@@ -5,5 +5,18 @@ Successorships provides a framework for fault-tolerant local area Web applicatio
 Its API is designed to hide underlying details of state replication and the distribution of client and server roles.
 The goal of this design is to spare the application developer the complexity of network behavior and let her focus on the implementation details of the application itself.
 The library is shipped as a JavaScript file {\ttfamily shippy.js} to be included in HTML files of the Web application.
-When loaded, all functionality is exposed on a JavaScript object {\ttfamily Shippy} that resides in the browser's global {\ttfamily window} object.
+When loaded, all functionality is exposed on a JavaScript object {\ttfamily Shippy} that resides as a property of the browser's global {\ttfamily window} object.
 This object is the only place of interference with the browser's global namespace to avoid naming collisions with the application's environment.
+
+The Successorships API consists of three methods exposed on the {\ttfamily Shippy} object as shown in Listing~\ref{lst:successorships_api}.
+
+\begin{lstlisting}[caption={Successorships API},label={lst:successorships_api}]
+Shippy.register(serviceName, {
+    init: function
+    operations: <object: key-function>
+});
+
+Shippy.call(operationName:string, operationData:object);
+
+Shippy.on(eventName:string, callback:function);
+\end{lstlisting}
