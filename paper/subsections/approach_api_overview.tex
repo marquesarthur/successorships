@@ -10,18 +10,22 @@ This object is the only place of interference with the browser's global namespac
 
 The API consists of three methods exposed on the {\ttfamily Shippy} object as shown in Listing~\ref{lst:api}.
 Using these three methods, Shippy apps (1) describe their operations on the app's replicated state ({\ttfamily Shippy.register}), (2) trigger these operations when required ({\ttfamily Shippy.call}) and (3) listen for events dispatched by the framework ({\ttfamily Shippy.on}).
-Again, it is important to highlight that these methods will be called from all participants without knowledge of underlying client or server roles. These characteristics will remain within the library and only the state and other information will be dispatched to the app with events.
+Again, it is important to highlight that these methods will be called from all nodes without knowledge of underlying client or server roles.
+These characteristics will remain within the library and only the state and other information will be dispatched to the app with events.
 
 \begin{lstlisting}[caption={Successorships API},label={lst:api}]
 Shippy.register(serviceName, {
     init: function
-    operations: <map: name => function>
+    operations: <object: name => function>
 });
 Shippy.call(operationName:string, operationData:object);
 Shippy.on(eventName:string, callback:function);
 \end{lstlisting}
 
-Usage of the API is best described with the \textit{QueueApp} example from section~\ref{sec:motivating_example}. The app declares a function {\ttfamily init} that describes how the initial state should be manipulated when the app starts. In the case of our QueueApp the state will be a simple queue array that must be set on the state. Listing~\ref{lst:init} shows how this is achieved.
+Usage of the API is best described with the \textit{QueueApp} example from section~\ref{sec:motivating_example}.
+The app declares a function {\ttfamily init} that describes how the initial state (initially an empty object) should be changed.
+In the case of our QueueApp the state will contain a simple array for the queue that must be set on the state.
+Listing~\ref{lst:init} shows how this is achieved.
 
 \begin{lstlisting}[caption={QueueApp init function},label={lst:init}]
 let init = function(state) {
@@ -29,7 +33,11 @@ let init = function(state) {
 };
 \end{lstlisting}
 
-The operations of the QueueApp are addition and removal of names to and from the queue. These functions will be called by the current server whenever the respective operations are invoked by clients (using {\ttfamily Shippy.call}). By definition, the operation functions will be called with two arguments: the current {\ttfamily state} object and the  {\ttfamily payload} given to {\ttfamily Shippy.call}. Listing~\ref{lst:operations} shows the operations of the QueueApp. The queue is an array that is treated as a \textit{LIFO set} data structure: items are added only if they do not exist and are removed only if they exist.
+The operations of the QueueApp are addition and removal of names to and from the queue.
+These functions will be called by the current server node whenever the respective operations are invoked by clients (using {\ttfamily Shippy.call}).
+By definition, the operation functions will be called with two arguments: the current {\ttfamily state} object and the {\ttfamily payload} given to {\ttfamily Shippy.call}.
+Listing~\ref{lst:operations} shows the operations of the QueueApp.
+The queue is an array that is treated as a \textit{LIFO set} data structure: items are added only if they do not exist and are removed only if they exist.
 
 \begin{lstlisting}[caption={QueueApp operations},label={lst:operations}]
 let operations = {
@@ -42,7 +50,9 @@ let operations = {
 };
 \end{lstlisting}
 
-The declared {\ttfamily init} function and {\ttfamily operations} object are then registered at the Shippy framework by calling {\ttfamily Shippy.register}. The first argument will be the name of the service to be advertised in the local network for the app, \textit{QueueApp} in our case. Listing~\ref{lst:register} shows the implementation.
+The declared {\ttfamily init} function and {\ttfamily operations} object are then registered at the Shippy framework by calling {\ttfamily Shippy.register}.
+The first argument will be the name of the service to be advertised in the local network for the app, \textit{QueueApp} in our case.
+Listing~\ref{lst:register} shows the implementation.
 
 \begin{lstlisting}[caption={Call to Shippy.register},label={lst:register}]
 Shippy.register("QueueApp", {
