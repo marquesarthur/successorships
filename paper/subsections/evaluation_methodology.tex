@@ -1,2 +1,64 @@
 \subsection{Methodology}
-\label{sub:evaluation_methodology}
+\label{sub:eval:evaluation_methodology}
+
+In order to evaluate~\APIName, we created a small mobile network using an Android Pixel 2 smarthpone mobile wi-fi hotspot.
+By using a mobile wi-fi hotspot, we aim to simulate intended uses cases where~\APIName could be used in practice.
+For instance, a group of executives could use their smarthpones and share a business presentation with their peers, or teatching assistants could use their phones and start a queue application, as previously explained in our motivating example (Section~\ref{sec:motivating_example}).
+
+
+With a mobile wireless network at hand, we used three MacOS computers to connect to it and one of them acted as the starting server, launching an instrumented version of a queue application built using the~\APIName API. 
+All computers used Firefox Aurora nightly build ({\texttt{50.0a2}}) and the three researchers acted as users of the queue application.
+
+
+Throughout our evaluation we followed a small script describing tasks to be executed at each one of the devices. Roughly, after the device who started the server, each device
+{\it (1)} discovered the running server in the network,
+{\it (2)} connected to the server,
+{\it (3)} executed either an enqueue request or a dequeue operation and then, 
+{\it (4)} the running server disconnected and, once a successor recovered from the failure
+{\it (5)} new clients would connect to the server.
+This scripted execution was carried over in a section that last roughly 45 minutes and some devices had one or more connections to the server through multiple tabs.
+
+
+Table~\ref{tbl:eval:experiment_summary} summarizes the events observed in our evaluation.
+Roughly, we had a minimum of 1 to a maximum of 8 devices connected at a given time, with 3 devices connected on average (sd $\rpm 1$). 
+There were 29 server disconnections and sequential server recovery events and a total of 28 operations were called. 
+The client connections column represents the number of times a device either connected to a server or reconnected to a server after a failure, thus it does not follow the number on the other columns.
+
+\begin{table}
+    \caption{Experiment Summary}
+    \label{tbl:eval:experiment_summary}
+    \centering
+    \begin{small}
+    \begin{tabular}{C{2.5cm}|C{2.5cm}|C{2.5cm}}
+    \hline
+    \bfseries \# Server Recoveries & \bfseries \# Client Connections & \bfseries \# Operation calls \\
+    \hline
+    29 & 257 & 28 \\
+    \hline
+    \end{tabular}
+    \end{small}
+\end{table}
+
+For each one of the events presented in the Table~\ref{tbl:eval:experiment_summary}, we are interested in measuring the amount of time it took from when the event occurred until when devices acknowledged the event and responded executing expected function in response to that event. 
+Each logged event is a tuple that contains at least an event name, device unique identifier, and a timestamp representing the milliseconds elapsed since the UNIX epoch.
+We chronologically sort all events collected in all devices and filter events of interest to compute our measurements.
+
+
+As an example, whenever a running server disconnects, our instrumented application logs an event of ``{\texttt{disconnecting}}'', which is followed by a successor device responding with a ``{\texttt{become\_server\_begin}}'' and either a ``{\texttt{become\_server\_end}}'' or ``{\texttt{become\_server\_error}}'' after the function's execution. This events are chronologically sorted, as depicted in the Listing~\ref{lst:events}, and we compute the elapsed time between them.
+
+\begin{tiny}
+\begin{lstlisting}[caption={Tuples with logged events},label={lst:events}, language=JavaScript]
+(timestamp, event, deviceID, server)
+(1512766249862, "disconnecting", 15127210, true),
+(1512766265059, "become_server_begin", 15223107, false),
+(1512766265669, "become_server_end", 15223107, true),
+...
+\end{lstlisting}    
+\end{tiny}
+
+
+Each device stored its own log in a local server and, after execution, all these files were grouped and processed to compute elapsed times. 
+We discuss our results in the following subsections.
+
+
+
