@@ -4,12 +4,12 @@
 \APIName provides a framework for fault-tolerant local area Web apps that we named \textit{Shippy}.
 Its API is designed to hide underlying details of state replication and the distribution of client and server roles.
 The goal of this design is to spare the app developer the complexity of network behavior and let her focus on the implementation details of the app itself.
-The library is shipped as a JavaScript file {\ttfamily shippy.js} to be included in HTML files of the Web app.
-When loaded, all functionality is exposed on a JavaScript object {\ttfamily Shippy} that resides as a property on the browser's global {\ttfamily window} object.
+The library is shipped as a JavaScript file \texttt{shippy.js} to be included in HTML files of the Web app.
+When loaded, all functionality is exposed on a JavaScript object \texttt{Shippy} that resides as a property on the browser's global \texttt{window} object.
 This object is the only place of interference with the browser's global namespace to avoid naming collisions with the app's environment.
 
-The API consists of three methods exposed on the {\ttfamily Shippy} object as shown in Listing~\ref{lst:api}.
-Using these three methods, Shippy apps (1) describe their operations on the app's replicated state ({\ttfamily Shippy.register}), (2) trigger these operations when required ({\ttfamily Shippy.call}) and (3) listen for events dispatched by the framework ({\ttfamily Shippy.on}).
+The API consists of three methods exposed on the \texttt{Shippy} object as shown in Listing~\ref{lst:api}.
+Using these three methods, Shippy apps (1) describe their operations on the app's replicated state (\texttt{Shippy.register}), (2) trigger these operations when required (\texttt{Shippy.call}) and (3) listen for events dispatched by the framework (\texttt{Shippy.on}).
 Again, it is important to highlight that these methods will be called from all nodes without knowledge of underlying client or server roles.
 These characteristics will remain within the library and only the current state and other information will be dispatched to the app with events.
 
@@ -23,7 +23,7 @@ Shippy.on(eventName:string, callback:function);
 \end{lstlisting}
 
 Usage of the API is best described with the \textit{QueueApp} example from section~\ref{sec:motivating_example}.
-The app declares a function {\ttfamily init} that describes how the initial state (initially an empty object) should be changed.
+The app declares a function \texttt{init} that describes how the initial state (initially an empty object) should be changed.
 In the case of our QueueApp the state will contain a simple array for the queue.
 Listing~\ref{lst:init} shows how this is achieved.
 
@@ -34,8 +34,8 @@ let init = function(state) {
 \end{lstlisting}
 
 The operations of the QueueApp are addition and removal of names to and from the queue.
-These functions will be called by the current server node whenever the respective operations are invoked by clients (using {\ttfamily Shippy.call}).
-By definition, the operation functions will be called with two arguments: the current {\ttfamily state} object and the {\ttfamily params} given to {\ttfamily Shippy.call}.
+These functions will be called by the current server node whenever the respective operations are invoked by clients (using \texttt{Shippy.call}).
+By definition, the operation functions will be called with two arguments: the current \texttt{state} object and the \texttt{params} given to \texttt{Shippy.call}.
 Listing~\ref{lst:operations} shows the operations of the QueueApp.
 The queue is an array that is treated as a \textit{LIFO set} data structure: items are added only if they do not exist and are removed only if they exist.
 
@@ -50,7 +50,7 @@ let operations = {
 };
 \end{lstlisting}
 
-The declared {\ttfamily init} function and {\ttfamily operations} object are then registered at the Shippy framework by calling {\ttfamily Shippy.register}.
+The declared \texttt{init} function and \texttt{operations} object are then registered at the Shippy framework by calling \texttt{Shippy.register}.
 The first argument will be the name of the service to be advertised in the local network for the app, \textit{QueueApp} in our case.
 Listing~\ref{lst:register} shows the implementation.
 
@@ -61,14 +61,14 @@ Shippy.register("QueueApp", {
 });
 \end{lstlisting}
 
-Once the app is registered and the node is connected as client, operations can be invoked with {\ttfamily Shippy.call}. Listing~\ref{lst:register} shows how the client node for Bob would add its name to the queue.
+Once the app is registered and the node is connected as client, operations can be invoked with \texttt{Shippy.call}. Listing~\ref{lst:register} shows how the client node for Bob would add its name to the queue.
 \begin{lstlisting}[caption={Shippy.call},label={lst:call}]
 Shippy.call("add", { name: "Bob" });
 \end{lstlisting}
 
-Underneath, this invokation of {\ttfamily Shippy.call} will result in a message sent on the WebSocket channel to the current server node (which may be the same as the client).
-It will contain the operation name \textit{add} and the payload {\ttfamily \{name: "Bob"\}}.
-On the current server node, the operation name will be matched against the set of operations provided earlier with {\ttfamily Shippy.register}.
+Underneath, this invocation of \texttt{Shippy.call} will result in a message sent on the WebSocket channel to the current server node (which may be the same as the client).
+It will contain the operation name \textit{add} and the payload \texttt{\{name: "Bob"\}}.
+On the current server node, the operation name will be matched against the set of operations provided earlier with \texttt{Shippy.register}.
 If an operation is found, the respective function is called with the current state object and the received payload (containing the name ``Bob'' in this case) as arguments.
 After the change was applied, an event \textit{stateupdate} is triggered and broadcasted to all clients that apply the operation to the state in the same way.
 Eventually, the app on each client will be notified with the \textit{stateupdate} event providing the newly computed state.
