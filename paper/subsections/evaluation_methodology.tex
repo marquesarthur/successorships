@@ -7,7 +7,7 @@ For instance, a group of executives could use their smarthpones and share a busi
 
 
 With a mobile wireless network at hand, we used three MacOS computers to connect to it and one of them acted as the starting server, launching an instrumented version of a queue application built using the~\APIName API. 
-All computers used Firefox Aurora nightly build ({\texttt{50.0a2}}) and the three researchers acted as users of the queue application.
+All computers used Firefox Aurora nightly build ({\ttfamily{50.0a2}}) and the three researchers acted as users of the queue application.
 
 
 Throughout our evaluation we followed a small script describing tasks to be executed at each one of the devices. Roughly, after the device who started the server, each device
@@ -44,7 +44,7 @@ Each logged event is a tuple that contains at least an event name, device unique
 We chronologically sort all events collected in all devices and filter events of interest to compute our measurements.
 
 
-As an example, whenever a running server disconnects, our instrumented application logs an event of ``{\texttt{disconnecting}}'', which is followed by a successor device responding with a ``{\texttt{become\_server\_begin}}'' and either a ``{\texttt{become\_server\_end}}'' or ``{\texttt{become\_server\_error}}'' after the function's execution. This events are chronologically sorted, as depicted in the Listing~\ref{lst:events}, and we compute the elapsed time between them.
+As an example, whenever a running server disconnects, our instrumented application logs an event of ``{\ttfamily{disconnecting}}'', which is followed by a successor device responding with a ``{\ttfamily{become\_server\_begin}}'' and either a ``{\ttfamily{become\_server\_end}}'' or ``{\ttfamily{become\_server\_error}}'' after the function's execution. This events are chronologically sorted, as depicted in the Listing~\ref{lst:events}, and we compute the elapsed time between them.
 
 \begin{tiny}
 \begin{lstlisting}[caption={Tuples with logged events},label={lst:events}, language=JavaScript]
