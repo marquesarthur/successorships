@@ -1,7 +1,7 @@
 \subsection{API Overview}
 \label{sub:approach_api_overview}
 
-Successorships provides a framework for fault-tolerant local area Web apps that we named \textit{Shippy}.
+\APIName provides a framework for fault-tolerant local area Web apps that we named \textit{Shippy}.
 Its API is designed to hide underlying details of state replication and the distribution of client and server roles.
 The goal of this design is to spare the app developer the complexity of network behavior and let her focus on the implementation details of the app itself.
 The library is shipped as a JavaScript file {\ttfamily shippy.js} to be included in HTML files of the Web app.
@@ -13,7 +13,7 @@ Using these three methods, Shippy apps (1) describe their operations on the app'
 Again, it is important to highlight that these methods will be called from all nodes without knowledge of underlying client or server roles.
 These characteristics will remain within the library and only the current state and other information will be dispatched to the app with events.
 
-\begin{lstlisting}[caption={Successorships API},label={lst:api}]
+\begin{lstlisting}[caption={\APIName API},label={lst:api}]
 Shippy.register(serviceName, {
     init: function
     operations: <object: name => function>
