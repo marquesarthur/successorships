@@ -1,17 +1,116 @@
 \subsection{Conceptual Description}
 \label{sub:approach_conceptual_description}
 
-\textbf{Architecture.} Figure~\ref{fig:stack} shows the \APIName stack. On the bottom layer are the \textit{Application layer protocols}. The Zeroconf protocols \textit{mDNS} and \textit{DNS-SD} are used for the advertisement and discovery of \APIshort services in the local network\footnote{We do not use these protocols directly but rely on their implementation in \textit{FlyWeb}.}. In terms of application-level network communication we use the common protocols of \textit{WebSocket} and \textit{HTTP}. The initial request to a \APIshort app is in form of a \textit{HTTP GET} request and associated request for static resources. Clients then establish a stable \textit{WebSocket} channel that is used for further communication between nodes (e.g. state replication). Above the application layer protocols is the \textit{FlyWeb} layer. We use FlyWeb as a library for facilitating interaction with the Zeroconf protocols. \APIName was designed with as few connection points with FlyWeb as possible such that this dependency can be easily replaced with a different implementation in the future. Above the FlyWeb layer is the \textit{\APIName} framework that exposes the API described in section~\ref{sub:approach_api_overview} to its applications that are located in the topmost layer.
+\textbf{Architecture.} 
+Figure~\ref{fig:stack} shows the \APIName stack.
+On the bottom layer are the \textit{Application layer protocols}.
+The Zeroconf protocols \textit{mDNS} and \textit{DNS-SD} are used for the advertisement and discovery of \APIshort services in the local network\footnote{We do not use these protocols directly but rely on their implementation in FlyWeb.}. 
+In terms of application-level network communication we use the common protocols of \textit{WebSocket} and \textit{HTTP}. 
+The initial request to a \APIshort app is in form of a \textit{HTTP GET} request and associated requests for static resources.  Clients then establish a stable \textit{WebSocket} channel that is used for further communication between nodes (e.g. state replication). 
+Above the application layer protocols is the \textit{FlyWeb} layer. 
+We use FlyWeb as a library for facilitating interaction with the Zeroconf protocols. 
+\APIName was designed with as few connection points with FlyWeb as possible such that this dependency can be easily replaced with a different implementation in the future. 
+Above the FlyWeb layer is the \textit{\APIName} framework that exposes the API described in section~\ref{sub:approach_api_overview} to its applications that are located in the topmost layer.
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=\linewidth]{stack}
+    \includegraphics[keepaspectratio,width=6cm]{stack}
     \caption{Successorships Stack}
     \label{fig:stack}
 \end{figure}
 
+\noindent\textbf{Roles and shared state.} When a Shippy app is loaded in the browser the new node becomes either a client or server node. If it becomes a server node, it becomes a client node to ``itself'' shortly after. The application's global state is replicated and shared among all client nodes (see later paragraphs in this section for details). The global state can contain arbitrary application data and global metadata accessible only by the \APIshort library. One such required metadata field is a \texttt{successors} list containing a list of current clients, except the client node that is currently also the server. This list is used to determine which node should become the next server node upon failure of the current one. Figure~\ref{fig:roles} visualizes the distribution of roles. Node \textit{A} is currently the server with nodes \textit{B...n} being clients. The list of successors is shared in the global state accessible by all nodes.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[keepaspectratio,width=6cm]{roles}
+    \caption{Successorships Roles}
+    \label{fig:roles}
+\end{figure}
+
+\noindent\textbf{Service discovery.} 
+The \APIshort library described in section~\ref{sec:sub:approach_api_overview} comes with a compulsory Firefox add-on responsible for notifying apps with the current set of available \APIshort services. 
+In the add-on, we register an event listener at a FlyWeb component \texttt{FlyWebDiscoveryManager} which is only available in the permission context of add-ons, making this a required mediator between FlyWeb and \APIshort Web apps. 
+The \texttt{FlyWebDiscoveryManager} module dispatches a list of current local services in frequent intervals using the \textit{DNS-SD} protocol described in section~\ref{sub:background_zeroconf_networking}. Figure~\ref{fig:discovery} illustrates this behavior.
+We sample these events to a maximum frequency of 100ms\footnote{We observed many duplicate and overly frequent event triggers from the \texttt{FlyWebDiscoveryManager} making this sampling necessary.} and filter out all services that were not published in the FlyWeb context\footnote{We aim to filter this list to contain only services published with Shippy rather than FlyWeb in the future, as described in section~\ref{sec:limitations_and_future_work}.}. 
+We then dispatch our own events containing the current list of FlyWeb services with the service name, IP address and port on the Browser's global \texttt{window} object. 
+These events are then accessible by any \APIshort app by registering an event listener as shown in listing~\ref{lst:service_discovery}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[keepaspectratio,width=6cm]{discovery}
+    \caption{Successorships service discovery}
+    \label{fig:discovery}
+\end{figure}
+
+\begin{lstlisting}[caption={Event listener for service discovery},label={lst:service_discovery}]
+window.addEventListener('flywebServicesChanged', function(event) {
+    let services = event.detail.services;
+    // e.g. [{ serviceName: "QueueApp",
+    // serviceUrl: "http://206.12.69.249:51629" }]
+});
+\end{lstlisting}
+
+\noindent\textbf{Service publication.}
+A \APIshort node will publish a service and hereby become a server node in certain cases depending on service discovery events and the current list of successors in the shared state. 
+The decision of whether to become a server is first triggered when (1) \textit{the app is loaded} in the browser and there is currently \textit{no service discovered with the app's name}. 
+This decision is then repeated (2) any time a \textit{discovery event} occurs and there is \textit{no such service}\footnote{There is one additional requirement to trigger the decision of whether to publish a service when an event reveals there is currently no service for the app: it must have been connected to a server node previously and been disconnected afterwards. 
+If this is not the case, the event should not trigger a server publish as this is handled by the first trigger (app load).}. 
+In both cases, the node will become a server if \textit{either} of the following conditions is true:
+\begin{itemize}
+    \item The \texttt successors list is empty \textit{and} this node loaded the application initially\footnote{This is determined by whether the application is currently served by a FlyWeb server node or by other means, e.g. a Web application or a simple HTML file from the file system.}.
+    \item The \texttt successors list is not empty \textit{and} the first item in the list refers to itself.
+\end{itemize}
+
+If one of the above conditions is met in a decision phase, a service with the app's name will be published and the node will become a server using the \texttt{window.navigator.publishServer} method provided by FlyWeb\footnote{https://github.com/flyweb/spec}. 
+This will then result in advertisement of the service in the local network using the \textit{mDNS} protocol described in section~\ref{sub:background_zeroconf_networking}. 
+Figure~\ref{fig:server} illustrates this behavior.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[keepaspectratio,width=8cm]{server}
+    \caption{Successorships service publication}
+    \label{fig:server}
+\end{figure}
+
+\noindent\textbf{Client succession.}
+A \APIshort node will become a client connecting to an existing service when a service discovery event is received and the following condition is true: \textit{there is currently a \APIshort service with the app's name available and the app is not currently connected to a server node}. 
+When a node becomes a client, it establishes a \textit{WebSocket} connection to the current server as the first part of the initial handshake. 
+On the server side, a unique ID is created for the new client and appended to the \texttt{successors} list. The updated \texttt{successors} list is then broadcasted to all currently connected clients. 
+The created ID is sent to the new client as the second part of the handshake and saved client-side such that it can be matched against the IDs in the \texttt{successors} list when the next server node must be determined in case of failure of the current server. 
+This is illustrated in Figure~\ref{fig:failure} where \textit{N} clients connected to a server \textit{A} and Figure~\ref{fig:succession} showing the state after failure of \textit{A}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[keepaspectratio,width=6cm]{failure}
+    \caption{Successorships server failure}
+    \label{fig:failure}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[keepaspectratio,width=6cm]{succession}
+    \caption{Successorships client succession}
+    \label{fig:succession}
+\end{figure}
+
+\noindent\textbf{Server implementation.}
+\APIName uses the concept of an in-browser Web server based on the \texttt{navigator.publishServer} implementation in FlyWeb.
+This implementation provides an API for received \textit{HTTP GET} requests and \textit{WebSocket} messages.
+Since any Web application relies on static resources (e.g. js, css, images) our FlyWeb server implementation must be able to load and serve these resources when requested by clients.
+The documentation of FlyWeb\footnote{https://flyweb.github.io/posts/2016/11/01/introducing-flyweb.html, accessed 2017-12-09} describes that this can be achieved with a call of \texttt{fetch} provided by the browser's \textit{Fetch API}\footnote{https://developer.mozilla.org/en-US/docs/Web/API/Fetch\_API, accessed 2017-12-09}.
+However, this is essentially just a redirect to the Web app that served the FlyWeb app at the first place.
+This is a problem for our scenario since the original Web app is not known to clients that took over the server role from another node\footnote{Also, we want to support scenarios where only the first client has access to the original Web app that bootstraps the FlyWeb application and clients subsequently only need access to the node that became the first FlyWeb server.}.
+We solved this problem by storing all resources required for the \APIshort app in the browser's \texttt{sessionStorage}\footnote{https://developer.mozilla.org/de/docs/Web/API/Window/sessionStorage, accessed 2017-12-09.} that is persistent for the duration of the current browser session.
+In the current implementation, all resources obtained upon load of the app are scanned for referenced resources.
+These are then fetched\footnote{In the future we aim to omit these secondary requests with a strategy of accessing these resources from the browser's native storage (see section~\ref{sec:limitations_and_future_work}).} and stored in \texttt{sessionStorage}.
+Subsequently, when \APIshort request static resources, these can be simply obtained from \texttt{sessionStorage} and served without any access to the original Web app.
 
 
-%Server publication and discovery
-%Client Succession
-%State Replication
+% LIMITATIONS:
+% all services are published to web apps
+% ip + port => no hostnames
+% only mac
+% time to recovery
+% weak consistency
+% server: prevent second fetch 
