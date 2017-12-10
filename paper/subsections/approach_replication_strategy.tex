@@ -2,7 +2,30 @@
 \label{sub:approach_replication_strategy}
 
 \textbf{State replication.}
+All \APIshort nodes share a versioned global state during the lifetime of the app.
+The app is ``alive'' as long as there is one node that advertises the app's service in the local network.
+Each time the state is changed on the server node, the state's version is incremented.
+The current state is obtained initially by clients triggered by the first handshake with the current server: whenever a new client connects, a WebSocket \texttt{open} event is triggered on the server and a new unique client ID is added to the \texttt{successors} list in the global state object.
+The changed state is then broadcasted to all clients\footnote{Note that we are broadcasting the full state in this case rather than a single operation.
+A possibly better solution could be that we broadcast only a \texttt{successoradded} operation to all clients except the new one and include the full state for the new client in the \texttt{welcome} message along with the newly created client ID.}, including the new one.
+This ensures that any new client is up-to-date shortly after connecting and all other clients will have the new client in their \texttt{successors} list.
+After a client is connected, it can invoke state changes on the server by invoking \texttt{Shippy.call} which will result in a WebSocket message to the server where the submitted operation is applied.
+After an operation was applied on the server, this operation is broadcasted to all clients in the order as they appear in the \texttt{successors} list in the shared state.
+Since the state is always changed on the current server first and changes are then broadcasted to clients, clients can simply apply the changes locally in ordinary cases.
+However, there can be exceptions in certain failure scenarios due to race conditions and the asynchronous nature of WebSocket broadcasting.
+We cope with such failures by versioning the state: when clients receive state changes (by listening to \texttt{stateupdate} events), they will check the version of the server's current state and compare it with the version of their local state.
+In case their local state is newer than the server state, they will send a \texttt{\_mostuptodate}\footnote{We precede messages not associated with app-defined operations with an underscore.} message to the server with their current local state as payload.
+The server can then accept this newer state and again broadcast a state update.
+Note that even if several clients send \texttt{\_mostuptodate} messages, the server will only accept these if their state's version is higher than its own, which indicates that consensus will be reached eventually.
+In the current \APIshort implementation, we consider clients being ``ahead'' of the server a hypothetical scenario that we could not produce in any of our evaluated use-cases.
+
 
 \noindent\textbf{Reaching consensus.}
 
 \noindent\textbf{Handled fault scenarios.}
+
+% LIMITATION
+% sometimes broadcast whole state
+% async state updates => could wait for first succ's ack
+
+%In the current implementation, the full state is broadcasted when a new client connects. This could be improved in the future by broadcasting only a 
