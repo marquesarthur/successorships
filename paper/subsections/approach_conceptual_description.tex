@@ -4,7 +4,7 @@
 \textbf{Architecture.} 
 Figure~\ref{fig:stack} shows the \APIName stack.
 On the bottom layer are the \textit{Application layer protocols}.
-The Zeroconf protocols \textit{mDNS} and \textit{DNS-SD} are used for the advertisement and discovery of \APIshort services in the local network\footnote{We do not use these protocols directly but rely on their implementation in \textit{FlyWeb}.}. 
+The Zeroconf protocols \textit{mDNS} and \textit{DNS-SD} are used for the advertisement and discovery of \APIshort services in the local network\footnote{We do not use these protocols directly but rely on their implementation in FlyWeb.}. 
 In terms of application-level network communication we use the common protocols of \textit{WebSocket} and \textit{HTTP}. 
 The initial request to a \APIshort app is in form of a \textit{HTTP GET} request and associated requests for static resources.  Clients then establish a stable \textit{WebSocket} channel that is used for further communication between nodes (e.g. state replication). 
 Above the application layer protocols is the \textit{FlyWeb} layer. 
@@ -94,10 +94,6 @@ This is illustrated in Figure~\ref{fig:failure} where \textit{N} clients connect
     \label{fig:succession}
 \end{figure}
 
-\noindent\textbf{State replication and consistency.}
-
-\noindent\textbf{Handled fault scenarios.}
-
 \noindent\textbf{Server implementation.}
 \APIName uses the concept of an in-browser Web server based on the \texttt{navigator.publishServer} implementation in FlyWeb.
 This implementation provides an API for received \textit{HTTP GET} requests and \textit{WebSocket} messages.
@@ -110,8 +106,6 @@ In the current implementation, all resources obtained upon load of the app are s
 These are then fetched\footnote{In the future we aim to omit these secondary requests with a strategy of accessing these resources from the browser's native storage (see section~\ref{sec:limitations_and_future_work}).} and stored in \texttt{sessionStorage}.
 Subsequently, when \APIshort request static resources, these can be simply obtained from \texttt{sessionStorage} and served without any access to the original Web app.
 
-%Client Succession
-%State Replication
 
 % LIMITATIONS:
 % all services are published to web apps
