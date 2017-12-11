@@ -11,6 +11,7 @@ A possibly better solution could be that we broadcast only a \texttt{successorad
 This ensures that any new client is up-to-date shortly after connecting and all other clients will have the new client in their \texttt{successors} list.
 After a client is connected, it can invoke state changes on the server by invoking \texttt{Shippy.call} which will result in a WebSocket message to the server where the submitted operation is applied.
 After an operation was applied on the server, this operation is broadcasted to all clients in the order as they appear in the \texttt{successors} list in the shared state.
+
 Since the state is always changed on the current server first and changes are then broadcasted to clients, clients can simply apply the changes locally in ordinary cases.
 However, there can be exceptions in certain failure scenarios due to race conditions and the asynchronous nature of WebSocket broadcasting.
 We cope with such failures by versioning the state: when clients receive state changes (by listening to \texttt{stateupdate} events), they will check the version of the server's current state and compare it with the version of their local state.
@@ -20,12 +21,13 @@ Note that even if several clients send \texttt{\_mostuptodate} messages, the ser
 In the current \APIshort implementation, we consider clients being ``ahead'' of the server a hypothetical scenario that we could not produce in any of our evaluated use-cases.
 
 
-\noindent\textbf{Reaching consensus.}
-
-\noindent\textbf{Handled fault scenarios.}
-
-% LIMITATION
-% sometimes broadcast whole state
-% async state updates => could wait for first succ's ack
-
-%In the current implementation, the full state is broadcasted when a new client connects. This could be improved in the future by broadcasting only a 
+\textbf{Reaching consensus.}
+We leverage the concepts of \textit{eventual consistency} and \textit{lazy replication} in \APIshort.
+We argue that our domain of local ad-hoc offline Web applications will mostly tolerate minor time frames of inconsistent states and we therefore focus on availability and performance rather than accepting the overhead induced by stronger consistency principles.
+With the replication strategy previously described, the state manipulation can only happen on the current server and clients are only notified of changes applied on the server.
+The most obvious source for inconsistencies would be lost messages carrying operations from server to client and vice versa.
+However, this potential problem is mostly mitigated by the design of the WebSocket protocol: each client is connected to the server with a stable bi-directional WebSocket channel. 
+Whenever this channel is interrupted, an \texttt{error} or \texttt{close} event will be triggered on both the client and the server side of the channel.
+In such cases, the server will simply remove the client both from its maintained collection of WebSocket clients and the \texttt{successors} list on the shared state (resulting in a \texttt{stateupdate} broadcast). 
+The client on the other hand, will try to create a new connection to the server, which will then result in obtaining a fresh copy of the server state.
+While we are certain that all nodes will eventually converge to a consistent state with our approach in most scenarios, we cannot eliminate the risk of inconsistencies in certain edge cases.

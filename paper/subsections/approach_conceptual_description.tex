@@ -105,12 +105,3 @@ We solved this problem by storing all resources required for the \APIshort app i
 In the current implementation, all resources obtained upon load of the app are scanned for referenced resources.
 These are then fetched\footnote{In the future we aim to omit these secondary requests with a strategy of accessing these resources from the browser's native storage (see section~\ref{sec:limitations_and_future_work}).} and stored in \texttt{sessionStorage}.
 Subsequently, when \APIshort request static resources, these can be simply obtained from \texttt{sessionStorage} and served without any access to the original Web app.
-
-
-% LIMITATIONS:
-% all services are published to web apps
-% ip + port => no hostnames
-% only mac
-% time to recovery
-% weak consistency
-% server: prevent second fetch 
