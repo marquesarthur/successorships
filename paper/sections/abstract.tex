@@ -1,8 +1,0 @@
-As networking capabilities become more ubiquitous across different types of devices, applications that communicate over local area networks are becoming increasingly common.
-This trend has been accelerated by the adoption of zero-configuration (zeroconf) networking standards that eliminate the burden of setup procedures.
-Applications operating in zeroconf settings often face the challenge of maintaining reliability and consistency in the face of wireless links and mobile devices, resulting in potentially intermittent connectivity between hosts.
-Fault-tolerance is thus a desirable property for such applications, but it can be difficult to achieve in practice.
-To this end, we introduce Successorships, a JavaScript library that provides the appealing qualities of zeroconf enriched with fault-tolerance, to applications running in the browser.
-Our library enables graceful recovery after server failure by handing over the server role to one of the clients currently in the network.
-We evaluate our approach with a sample application, focusing on usage scenarios that involve interactions between users walking in and out of a single room. 
-We find that our library recovers from failures gracefully after an average of 3.5 seconds, and that application state is maintained with eventual consistency.
