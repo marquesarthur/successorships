@@ -23,17 +23,24 @@ It suffices to say that we could not see bottlenecks for either the number of no
 Therefore, we believe that \APIshort applications do not have considerable traffic bottlenecks and users would have a smooth browser experience.
 
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.75\linewidth]{message-RTT}
-    \caption{Operation Round Trip Time}
-    \label{fig:message-RTT}
-\end{figure}
 
+\begin{figure*}
+    \minipage{0.32\textwidth}%
+        \centering
+        \includegraphics[width=0.9\textwidth]{client-welcome-state-size}
+        \caption{Client time to connect as a function of the server state size}\label{fig:client-welcome-state-size}
+    \endminipage\hfill
+    \minipage{0.32\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{message-RTT}
+        \caption{Operation Round Trip Time}
+        \label{fig:message-RTT}
+    \endminipage\hfill
+    \minipage{0.32\textwidth}%
+        \centering
+        \includegraphics[width=0.9\textwidth]{state-convergence}
+        \caption{State convergence - time it takes for all clients to update their state}
+        \label{fig:state-convergence}
+    \endminipage
+\end{figure*}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.75\linewidth]{state-convergence}
-    \caption{State convergence - time it takes for all clients to update their state after a broadcast}
-    \label{fig:state-convergence}
-\end{figure}

@@ -2,6 +2,24 @@
 \label{sub:eval:connection}
 
 
+\begin{figure*}
+    \minipage{0.32\textwidth}%
+        \centering
+        \includegraphics[width=0.9\linewidth]{server-recovery}
+        \caption{Recovery time after a server failure}\label{fig:server-recovery}%
+    \endminipage\hfill
+    \minipage{0.32\textwidth}
+        \centering
+        \includegraphics[width=0.89\textwidth]{client-welcome}
+        \caption{Client connection time until receiving a copy of the state}\label{fig:client-welcome}%
+    \endminipage\hfill
+    \minipage{0.32\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{client-welcome-successors}
+        \caption{Client time to connect per number of successors}\label{fig:client-welcome-successors}%
+    \endminipage\hfill
+\end{figure*}
+
 We define client connection as the amount of time it takes for a device to connect, as a client node, to a published server.
 This connection time takes into account not only the time it takes for that client to connect to the server, 
 but also the time it takes for that client to have its own copy of the server state. 
@@ -16,14 +34,6 @@ Inspecting this corner case scenarios, we identified that they were mostly relat
 In other cases were this affirmation did not hold, we hypothesize that the hotspot connection was not stable, but we lack data to support this hypothesis.
 
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.9\linewidth]{client-welcome}
-    \caption{Client time to open a connection and join the server until it receives the server state}
-    \label{fig:client-welcome}
-\end{figure}
-
-
 In order to further investigate client connection properties, we analyzed whether the number of connected devices or the server state size influences connection time.
 Figure~\ref{fig:client-welcome-successors} presents a boxplot chart for the connection time grouped by the number of successors.
 Despite the fact that all connected clients receive a state update with the newest successorship list, 
@@ -34,17 +44,6 @@ This give us insights about benefits and limitations of our current implementati
 Based on client connection measurements, we posit that \APIshort could scale with more connect devices, though the state variable is a bottleneck and applications that require a larger state are compromised.
 
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.9\linewidth]{client-welcome-successors}
-    \caption{Client time to connect per number of successors}
-    \label{fig:client-welcome-successors}
-\end{figure}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.9\linewidth]{client-welcome-state-size}
-    \caption{Client time to connect as a function of the server state size}
-    \label{fig:client-welcome-state-size}
-\end{figure}
+    
 
