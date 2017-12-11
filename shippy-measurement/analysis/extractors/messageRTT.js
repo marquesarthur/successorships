@@ -1,7 +1,7 @@
 let {Utils} = require('../utils');
 
 function extractMessageRTT(log) {
-	let eventsOfInterest = ['shippy_client_received_stateupdate', 'shippy_client_call_remove', 'shippy_client_call_add', 'shippy_client_call_setRevealState', 'shippy_client_call_addName', 'shippy_client_call_setServerName'];
+	let eventsOfInterest = ['shippy_client_received_stateupdate', 'shippy_client_call_remove', 'shippy_client_call_add'];
 
 
 
@@ -23,7 +23,7 @@ function extractMessageRTT(log) {
 					while (nextIdx < events.length) {
 						let next = events[nextIdx];
 						if (eventEnds.includes(next.event) && next.source === current.source) {
-							let elapsedTime = (next.timestamp - current.timestamp) / 1000;
+							let elapsedTime = (next.timestamp - current.timestamp) ;
 							result.push(header + ',' + operation + ',' + elapsedTime + ',' +
 								next.pkgSize + ',' + next.numSuccessors + ',' +
 								next.version
