@@ -1,32 +1,46 @@
 \section{Limitations and Future Work}
 \label{sec:limitations_and_future_work}
 
+While we consider \APIName a good functional proof of concept we acknowledge a number of limitations that we would like to improve in the future.
 
-% ===
-% Felix: below is just a random collection of notes I took during writing other parts
+\textbf{Platform dependency and time-to-recovery.}
+We used components of Mozilla FlyWeb for service publishing and discovery, acting as a mediator between \APIshort and the Zeroconf protocols.
+FlyWeb is currently not maintained by Mozilla\footnote{We contacted the authors of FlyWeb and asked about the current status of the project. FlyWeb started as a side-project of two Mozilla developers and was then advertised intensely in 2016. 
+The add-on was eventually integrated into the Firefox core. However, maintenance was discarded after a ``shift of priorities'' at Mozilla and the module was removed in a subsequent version of Firefox. 
+We approached the authors with our idea of adding a fault-tolerance layer to FlyWeb and received a very encouraging response: the idea had been around among the authors and could have been one next step if the project had been continued.} and we relied on an archived version of the Firefox Developer Edition for our implementation. 
+Furthermore, our implementation is currently only running on MacOS due to a known bug in the \textit{mDNS} implementation in FlyWeb. 
+While the respective ticket\footnote{https://bugzilla.mozilla.org/show\_bug.cgi?id=1294772, accessed 2017-12-10.} claims the bug is fixed we were not able to obtain a version with the fix. 
+Furthermore, the service discovery implementation in FlyWeb is considerably slow and both the removal of a disconnected service and the addition of a new service take several seconds. 
+This is the root problem of a fairly disappointing time-to-recovery in section~\ref{sec:evaluation} and our highest priority for future improvements. 
+Due to the aforementioned issues we have considered discarding FlyWeb and working on our own implementation of the Zeroconf protocols instead.
 
-% LIMITATIONS:
-% all services are published to web apps
-% ip + port => no hostnames
-% only mac
-% time to recovery
-% weak consistency
-% server: prevent second fetch 
+\textbf{Security.}
+We clearly accepted a few security concerns for the \APIName proof of concept but we are aware of their importance in a potential productive version of our framework. Firstly, in certain failure cases where a client state is newer than a server state, clients can essentially \textit{overwrite} the server state. This opens up the risk of malicious clients imposing a manipulated state onto our network. This could be tackled by a validation mechanism on the server and other means of establishing trust between participants. Secondly, our add-on component described in section~\ref{sub:approach_conceptual_description} exposes \textit{all} local FlyWeb services to the browser's global \texttt{window} object. This essentially means that any Web application running in the browser can read information on the FlyWeb services available in the user's local network. This can be solved in the future by only exposing the service for the currently running app in discovery events.
 
-% LIMITATION
-% sometimes broadcast whole state
-% async state updates => could wait for first succ's ack
+\textbf{Consistency guarantees.}
+As described in section~\ref{sub:approach_replication_strategy} we built \APIName on the concepts of eventual consistency and lazy replication. 
+This approach will tolerate inconsistencies between participants to some degree with the assumption of reaching consensus when the system ``quiesce'' for a period of time. 
+We acknowledge that this model may not be sufficient for some applications. 
+We have considered to notify the first client in the \texttt{successors} list and only broadcast updates to other clients when an acknowledgement was received.
+We faced technical difficulties with this strategy and restrained from an implementation of the idea.
+Since it is much more important that the first successor is up-to-date compared to other clients, we can still imagine a future implementation.
 
-%In the current implementation, the full state is broadcasted when a new client connects. This could be improved in the future by broadcasting only a 
+Furthermore, we still broadcast the whole state in certain scenarios.
+This could result in significant traffic on the WebSocket channels that may overwhelm the network for considerable sizes of the state and number of clients. 
+We consider moving to a fully operation-based approach in the future.
+We have also considered using a \textit{CRDT} for our implementation, but we believe that the constraint of commutativity of operations, or associativity of merging conflicting states, is potentially too restricting for the range of applications we would want to allow to run on our framework.
 
-% LIMITATIONS
-%In certain failure cases where a client state is newer than a server state, clients can essentially \textit{overwrite} the server state.
-%This opens up the risk of being spoofed by malicious clients imposing a manipulated state onto our network, but as stated previously, we allow ourselves to assume full trust between all participants in the network.
-%We have considered using a \textit{CRDT} for our implementation, but we believe that the constraint of commutativity of operations, or associativity of merging conflicting states, is potentially too restricting for the range of applications we would want to allow to run on our framework.
-%We have also considered to notify the first client in the \texttt{successors} list and only broadcast to other clients when an acknowledgement was received.
-%We faced technical difficulties with this strategy and were not convinced enough of the benefits to justify further efforts.
+Finally, the global state is currently computed any time an operation is received. We consider treating the state as an ordered set of atomic operations such that the state can be re-computed any time by executing all operations from the set. This would improve the consistency guarantees we can provide and establish a basis for at least two more features we have in mind: the merging of multiple servers running in parallel and local operation queues on currently disconnected clients that are sent in batches to the server upon reconnecting.
 
-% LIMITATIONS
-% transmission queue
+\textbf{Usability.}
+We currently use IP/port based URLs for \APIshort services. Besides the lack of usability of such URLs, there is another major disadvantage: in cases where the server role migrates to a different node, clients will establish a WebSocket connection to the new server node using the advertised IP-port URL, but the browser's address bar will still point to the old address. A reload in the browser will then result in a \textit{not found} page because the old server is not available anymore. This problem may be solved by using persistent hostnames and local DNS resolution for \APIshort apps but this would require further research.
 
-% We considered starting the next server immediately subsequent to a WebSocket close event, but restrained from this approach being too error-prone. For example, a simple page reload on the current server would trigger a WebSocket \texttt{close} event on all clients and one of them immediately becoming the next server. This would introduce another race condition between the first successor and the original server that registers itself again immediately after page reload. Our existing approach deals with this problem much more gracefully: the original server will simply remain the server because the set of current services is updated only in much longer intervals. The downside of our approach is a significantly increased time of recovery.
+Also, we currently do not provide a browser UI listing available \APIshort services The respective FlyWeb menu works only unreliably and comes with the previously described platform dependency problem. We aim to provide a separate menu UI for supported browsers with a menu listing only \APIshort services.
+
+\textbf{Server implementation.}
+As described in section~\ref{sub:approach_conceptual_description} our current server implementation re-fetches all static resources obtained from the original Web server and saves these resources in the browser's \texttt{sessionStorage}. Since the resources are already fetched when they are discovered in the loaded HTML file (e.g. index.html) by the browser, this second fetch is technically not required. We aim to analyze how these resources can be accessed without a second manual fetch.
+
+Moreover, we did not evaluate server performance. Since any device can become a server with our implementation it is important to analyze performance and resource consumption of our approach on different devices and scales.
+
+\textbf{Who can publish a service?}
+We did not differentiate between clients in terms of device types, user groups or other criteria. In our implementation, all participants are treated equal and any client can publish a service and become a server. We acknowledge that different devices and user roles can be very useful for \APIshort apps. For example, we might only want more powerful devices or certain users become servers. We can imagine bringing this aspect to \APIName in the future.
