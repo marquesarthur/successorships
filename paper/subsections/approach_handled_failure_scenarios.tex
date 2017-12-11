@@ -1,8 +1,7 @@
 \subsection{Handled Failure Scenarios}
 \label{sub:approach_handled_failure_scenarios}
 
-With our replication and consistency strategies, we handle different scenarios of failures gracefully. There are further scenarios that represent edge cases that we do not cope with at the moment. 
-We address these in section~\ref{sec:limitations_and_future_work}.
+With our replication and consistency strategies, we handle different scenarios of failures gracefully.
 
 \textbf{Client disconnection.} 
 While disconnecting clients are mostly a trivial circumstance in traditional Web apps, they are more complex in \APIshort apps because the system relies on clients being represented in the shared \texttt{successors} list. 
@@ -15,7 +14,7 @@ A disconnected server will result in a WebSocket \texttt{close} event triggered 
 After some time, the service discovery mechanism described in Section~\ref{sub:approach_conceptual_description} will reveal that there is no more service currently registered with the app's service name. 
 This is the time when one of the previously connected client nodes will become the next server\footnote{We considered starting the next server immediately subsequent to a WebSocket close event but restrained from this approach, considering it too error-prone. For example, a simple page reload on the current server would trigger a WebSocket \texttt{close} event on all clients and one of them immediately becoming the next server. This would introduce another race condition between the first successor and the original server that registers itself again immediately after page reload. Our existing approach deals with this problem much more gracefully: the original server will simply remain the server because the set of current services is updated much less frequently. The downside of our approach is a significantly increased time of recovery. See section~\ref{sec:limitations_and_future_work} for further details.}: each client compares the first item in the shared \texttt{successors} list with its ID (obtained with the \texttt{welcome} message of the initial handshake). 
 If it matches, the client will publish a server as described in Section~\ref{sub:approach_conceptual_description}. 
-Otherwise, it will continue listening for service discovery events until a service with the app's name is available and connect to it.
+Otherwise, it will connect as soon as a service with the app's service name is available in a subsequent service discovery event.
 
 \textbf{Simultaneous disconnection.} 
 In this scenario, the server and one or multiple clients fail within a short time frame. 
