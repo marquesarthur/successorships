@@ -30,6 +30,8 @@ Despite the fact that all connected clients receive a state update with a new su
 we could not see how the number of successors influences a new client connection and all boxplot charts overlap.
 On the other hand, Figure~\ref{fig:client-welcome-state-size} models time as a linear function of the server state size.
 Intuitively, as the server state increases in size, clients take longer to connect. 
+This give us insights about benefits and limitations of our current implementation.
+Based on client connection measurements, we posit that \APIshort could scale with more connect devices, though the state variable is a bottleneck and applications that require a larger state are compromised.
 
 
 \begin{figure}
@@ -42,6 +44,7 @@ Intuitively, as the server state increases in size, clients take longer to conne
 \begin{figure}
     \centering
     \includegraphics[width=0.9\linewidth]{client-welcome-state-size}
-    \caption{Client time to connect as a function of the server state}
+    \caption{Client time to connect as a function of the server state size}
     \label{fig:client-welcome-state-size}
 \end{figure}
+
