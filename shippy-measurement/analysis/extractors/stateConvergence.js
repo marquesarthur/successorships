@@ -1,7 +1,7 @@
 let {Utils} = require('../utils');
 
 function extractStateConvergence(log) {
-	let eventsOfInterest = ['shippy_client_received_stateupdate', 'shippy_client_call_remove', 'shippy_client_call_add', 'shippy_client_call_setRevealState', 'shippy_client_call_addName', 'shippy_client_call_setServerName'];
+	let eventsOfInterest = ['shippy_client_received_stateupdate', 'shippy_client_call_remove', 'shippy_client_call_add'];
 
 
 
@@ -34,7 +34,7 @@ function extractStateConvergence(log) {
 									last.version
 								);
 							}
-						} else if (eventEnds.includes(next.event) && (next.version - current.version + 1 > 1)){
+						} else if (typeof last !== 'undefined' && eventEnds.includes(next.event) && (next.version - current.version + 1 > 1)){
 							let elapsedTime = (last.timestamp - current.timestamp) / 1000;
 							result.push(header + ',' + operation + ',' + elapsedTime + ',' +
 								last.pkgSize + ',' + last.numSuccessors + ',' +
