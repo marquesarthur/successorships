@@ -6,6 +6,8 @@ node_modules/
 #shippy-measurement/output/*.json
 #shippy-measurement/input/*.json
 
+.RData
+
 
 *.acn
 *.acr
