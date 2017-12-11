@@ -1,30 +1,33 @@
 \subsection{Methodology}
 \label{sub:eval:evaluation_methodology}
 
-In order to evaluate Successorships, we created a small mobile network using an Android Pixel 2 smarthpone mobile wi-fi hotspot.
-By using a mobile wi-fi hotspot, we aim to simulate intended uses cases where~\APIName could be used in practice.
+In order to evaluate \APINameNoSpace, we created a small mobile network using an Android Pixel 2 smartphone mobile Wi-Fi hotspot.
+We aimed to simulate intended uses cases where~\APIName could be used in practice. 
 For instance, a group of executives could use their smartphones and share a business presentation with their peers, or teaching assistants could use their phones and start a queue application, as previously explained in our motivating example (Section~\ref{sec:motivating_example}).
 
 
-With a mobile wireless network at hand, we used three MacOS computers to connect to it and one of them acted as the starting server, launching an instrumented version of a queue application built using the~\APIName API. 
-All computers used Firefox Aurora nightly build ({\texttt{50.0a2}}) and the three researchers acted as users of the queue application.
+We connected to our ad-hoc network with three MacOS computers, among which one acted as the starting server launching an instrumented version of a queue application built using the~\APIName API. 
+All devices used Firefox Aurora Nightly build {\texttt{50.0a2}} and the three researchers acted as users of the queue application.
 
 
-Throughout our evaluation we followed a small script describing tasks to be executed at each one of the devices. 
-Roughly, after the device who started the server, each device
+Throughout our evaluation we followed a small script describing tasks to be executed at each of the devices. 
+After the server was started, each device
 {\it (1)} discovered the running server in the network,
-{\it (2)} connected to the server,
-{\it (3)} executed either an enqueue operation or a dequeue operation and then, 
-{\it (4)} the running server disconnected
-{\it (5)} and the successor node would recover from the failure, hence
-{\it (6)} new clients would connect to the new server.
-It is worth noting that during step 3, we add an extra field to the called operations, this extra fields adds a random string with variable size (in bytes) drawn from a long-tailed power of two distribution. 
-By adding this field, we aim to investigate the effects of different payloads/state sizes to \APIName apps.
-Our scripted execution was carried over in a section that last roughly 40 minutes and some devices had one or more connections to the server node through multiple tabs.
+{\it (2)} connected to the server and
+{\it (3)} executed either an enqueue or dequeue operation.
+Afterwards,  
+{\it (4)} the running server disconnected and 
+{\it (5)} the successor node started a new server.
+Finally, 
+{\it (6)} all existing clients (re-)connected to the new server.
+
+At step {\it (3)} we added an extra field to the payload of the called operations that contained a random string with variable size drawn from a long-tailed power-of-two distribution. 
+By adding this field, we aimed to investigate the effects of different payloads/state sizes to \APIshort apps.
+Our scripted execution was performed in a section that lasted about 40 minutes and some devices had one or more connections to the server node through multiple tabs.
 
 
 Table~\ref{tbl:eval:experiment_summary} summarizes the events observed in our evaluation.
-Roughly, we had a minimum of 1 to a maximum of 8 devices connected at a given time, with 3 devices connected on average (sd $\rpm 1$ devices). 
+We had a minimum of 1 to a maximum of 8 devices connected at a given time, with 3 devices connected on average (sd $\rpm 1$ devices). 
 There were 29 server disconnections and sequential server recovery events as well as a total of  28 executed operations. 
 The total number of client connections represents the number of times a device either connected to a server or reconnected to a new server after a failure.
 
@@ -43,12 +46,12 @@ The total number of client connections represents the number of times a device e
     \end{small}
 \end{table}
 
-For each one of the events presented in the Table~\ref{tbl:eval:experiment_summary}, we are interested in measuring the amount of time it took from when the event occurred until when devices acknowledged the event and responded executing their expected functions in response to that event. 
+For each of the events presented in the Table~\ref{tbl:eval:experiment_summary}, we are interested in measuring the time between the occurrence of the event and the expected function calls in response to this event.
 Each logged event is a tuple that contains at least an event name, device unique identifier, and a timestamp representing the milliseconds elapsed since the \texttt{UNIX} epoch.
 
 
-As an example, whenever a running server disconnects, our instrumented application logs an event of ``{\texttt{disconnecting}}'', which is followed by a successor device responding with a ``{\texttt{become\_server\_begin}}'' and either a ``{\texttt{become\_server\_end}}'' or ``{\texttt{become\_server\_error}}'' after the function's execution. 
-This events are chronologically sorted, as depicted in the Listing~\ref{lst:events:server-recovery}, and we compute the elapsed time between them.
+For example, whenever a running server disconnects, our instrumented app logs a \texttt{disconnecting} event which is followed by a successor device responding with \texttt{become\_server\_begin} event and either a \texttt{become\_server\_end} or \texttt{become\_server\_error} event after the function executed. 
+These events are chronologically sorted, as depicted in Listing~\ref{lst:events:server-recovery}, and we compute the elapsed time between them.
 
 \begin{tiny}
 \begin{lstlisting}[caption={Tuples with logged events},label={lst:events:server-recovery}, language=JavaScript]
@@ -61,9 +64,9 @@ This events are chronologically sorted, as depicted in the Listing~\ref{lst:even
 \end{tiny}
 
 
-Each device stored its own log in a local server and, after execution, all these files were grouped and processed to compute elapsed times. 
-We chronologically sort all collected events and we filter events of interest to compute our measurements. 
-Results are discussed in the following subsections and, whenever necessary, we explicitly detail the events used to compute measurements for that subsection.
+Each device stored its own log using a local server and, after execution, all these files were grouped and processed to compute elapsed times. 
+We chronologically sorted all collected events and filtered events of interest to compute our measurements. 
+Results are discussed in the following subsections and we explicitly detail the events used to compute measurements for each subsection whenever necessary.
 
 
 

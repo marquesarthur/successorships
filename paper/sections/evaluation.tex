@@ -1,8 +1,9 @@
 \section{Evaluation}
 \label{sec:evaluation}
 
-In this section we evaluate~\APIName efficiency on detecting server failures and recovering from them (Section~\ref{sub:eval:server-recovery}).
-Additionally, we evaluate the time it takes for a new client to fully join a~\APIName Web app, i.e. establish a web socket connection to the running server and receive the server state with its list of successors (Section~\ref{sub:eval:connection}); as well as package traffic through the devices connected with a~\APIName Web app (Section~\ref{sub:eval:traffic}).
+In this section we evaluate the efficiency of ~\APIName in detecting server failures and in subsequent recovery (Section~\ref{sub:eval:server-recovery}).
+We then evaluate the time it takes for a new client to fully join a running~\APIName app, i.e. to establish a WebSocket connection to the running server and receive the server state with the \texttt{successors} list (Section~\ref{sub:eval:connection}).
+Finally, we measure package traffic at the devices connected with a~\APIName app (Section~\ref{sub:eval:traffic}).
 
 \input{subsections/evaluation_methodology}
 
