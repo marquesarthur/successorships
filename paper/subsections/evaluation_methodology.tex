@@ -16,8 +16,8 @@ Roughly, after the device who started the server, each device
 {\it (2)} connected to the server,
 {\it (3)} executed either an enqueue operation or a dequeue operation and then, 
 {\it (4)} the running server disconnected
-{\it (5)} and, once a successor recovered from the failure,
-{\it (6)} new clients would connect to the server.
+{\it (5)} and the successor node would recover from the failure, hence
+{\it (6)} new clients would connect to the new server.
 It is worth noting that during step 3, we add an extra field to the called operations, this extra fields adds a random string with variable size (in bytes) drawn from a long-tailed power of two distribution. 
 By adding this field, we aim to investigate the effects of different payloads/state sizes to \APIName apps.
 Our scripted execution was carried over in a section that last roughly 40 minutes and some devices had one or more connections to the server node through multiple tabs.
@@ -25,7 +25,7 @@ Our scripted execution was carried over in a section that last roughly 40 minute
 
 Table~\ref{tbl:eval:experiment_summary} summarizes the events observed in our evaluation.
 Roughly, we had a minimum of 1 to a maximum of 8 devices connected at a given time, with 3 devices connected on average (sd $\rpm 1$ devices). 
-There were 29 server disconnections and sequential server recovery events as well as a total of executed 28 operations. 
+There were 29 server disconnections and sequential server recovery events as well as a total of  28 executed operations. 
 The total number of client connections represents the number of times a device either connected to a server or reconnected to a new server after a failure.
 
 \begin{table}
