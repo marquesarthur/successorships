@@ -20,7 +20,7 @@ Shippy.Server = (function() {
 			// Should we trigger a broadcast here? I think I will always be the first client when I reveal
 			// myself but I'm not really sure.
 		},
-		_mostuptodate: function (state, params) {
+		_aheadofserver: function (state, params) {
 			// This route is called when upon connection, a client signals that it has the most up-to-date state
 			// In that case, the server needs to make a copy of his list of successors and then, update the state based on what he received from the client
 			// This is not optimal. Ideally, instead of sending the most up-to-date state,
