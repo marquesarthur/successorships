@@ -11,6 +11,7 @@ A possibly better solution could be that we broadcast only a \texttt{successorad
 This ensures that any new client is up-to-date shortly after connecting and all other clients will have the new client in their \texttt{successors} list.
 After a client is connected, it can invoke state changes on the server by invoking \texttt{Shippy.call} which will result in a WebSocket message to the server where the submitted operation is applied.
 After an operation was applied on the server, this operation is broadcasted to all clients in the order as they appear in the \texttt{successors} list in the shared state.
+
 Since the state is always changed on the current server first and changes are then broadcasted to clients, clients can simply apply the changes locally in ordinary cases.
 However, there can be exceptions in certain failure scenarios due to race conditions and the asynchronous nature of WebSocket broadcasting.
 We cope with such failures by versioning the state: when clients receive state changes (by listening to \texttt{stateupdate} events), they will check the version of the server's current state and compare it with the version of their local state.
@@ -20,12 +21,31 @@ Note that even if several clients send \texttt{\_mostuptodate} messages, the ser
 In the current \APIshort implementation, we consider clients being ``ahead'' of the server a hypothetical scenario that we could not produce in any of our evaluated use-cases.
 
 
-\noindent\textbf{Reaching consensus.}
-
-\noindent\textbf{Handled fault scenarios.}
+\textbf{Reaching consensus.}
+We leverage the concepts of \textit{eventual consistency} and \textit{lazy replication} in \APIshort.
+We argue that our domain of local ad-hoc offline Web applications will mostly tolerate minor time frames of inconsistent states and we therefore focus on availability and performance rather than accepting the overhead induced by stronger consistency principles.
+With the replication strategy previously described, the state manipulation can only happen on the current server and clients are only notified of changes applied on the server.
+The most obvious source for inconsistencies would be lost messages carrying operations from server to client and vice versa.
+However, this potential problem is mostly mitigated by the design of the WebSocket protocol: each client is connected to the server with a stable bi-directional WebSocket channel. 
+Whenever this channel is interrupted, an \texttt{error} or \texttt{close} event will be triggered on both the client and the server side of the channel.
+In such cases, the server will simply remove the client both from its maintained collection of WebSocket clients and the \texttt{successors} list on the shared state (resulting in a \texttt{stateupdate} broadcast). 
+The client on the other hand, will try to create a new connection to the server, which will then result in obtaining a fresh copy of the server state.
+While we are certain that all nodes will eventually converge to a consistent state with our approach in most scenarios, we cannot eliminate the risk of inconsistencies in certain edge cases.
 
 % LIMITATION
 % sometimes broadcast whole state
 % async state updates => could wait for first succ's ack
 
 %In the current implementation, the full state is broadcasted when a new client connects. This could be improved in the future by broadcasting only a 
+
+% LIMITATIONS
+%In certain failure cases where a client state is newer than a server state, clients can essentially \textit{overwrite} the server state.
+%This opens up the risk of being spoofed by malicious clients imposing a manipulated state onto our network, but as stated previously, we allow ourselves to assume full trust between all participants in the network.
+%We have considered using a \textit{CRDT} for our implementation, but we believe that the constraint of commutativity of operations, or associativity of merging conflicting states, is potentially too restricting for the range of applications we would want to allow to run on our framework.
+%We have also considered to notify the first client in the \texttt{successors} list and only broadcast to other clients when an acknowledgement was received.
+%We faced technical difficulties with this strategy and were not convinced enough of the benefits to justify further efforts.
+
+% LIMITATIONS
+% transmission queue
+
+% We considered starting the next server immediately subsequent to a WebSocket close event, but restrained from this approach being too error-prone. For example, a simple page reload on the current server would trigger a WebSocket \texttt{close} event on all clients and one of them immediately becoming the next server. This would introduce another race condition between the first successor and the original server that registers itself again immediately after page reload. Our existing approach deals with this problem much more gracefully: the original server will simply remain the server because the set of current services is updated only in much longer intervals. The downside of our approach is a significantly increased time of recovery.
