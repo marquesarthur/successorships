@@ -19,7 +19,8 @@ Since state convergence takes longer than message RTT, we further investigate ho
 We followed a similar strategy to the one for client connection, evaluating boxplots per number of successors and convergence time as a linear function of the operations' payload.
 For the sake of brevity, and due to space limitations, we refrain from plotting charts for these scenarios.
 It suffices to say that we could not see bottlenecks for either the number of nodes or the payload size. 
-Interestingly, using a payload with size equal to the one that slew down client connection (1MB), convergence time was $time(payload = 1MB) \approx 1.6s$ and results from the empirical cumulative function are affected by 4 outliers that are greater than 1.6 seconds.
+Interestingly, using a payload with size equal to the one that slew down client connection (1MB), convergence time was $\approx 1.6s$.
+We also noticed that results from the empirical cumulative function are affected by 4 outliers that are greater than 1.6 seconds.
 As we could not identify a pattern in the number of successors or payload size for these outliers, we hypothesize once again that the hotspot connection was not stable during convergence for these cases.
 
 
