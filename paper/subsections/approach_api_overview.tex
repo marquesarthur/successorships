@@ -2,7 +2,7 @@
 \label{sub:approach_api_overview}
 
 \APIName -- or shortly \textit{Shippy} -- provides a framework for fault-tolerant local area Web apps.
-Its API is designed to hide underlying details of the mDNS and DNS-SD protocls, state replication, and the distribution of client and server roles.
+Its API is designed to hide underlying details of the mDNS and DNS-SD protocols, state replication, and the distribution of client and server roles.
 The goal of this design is to spare the app developer the complexity of network behavior and let her focus on the implementation details of the app itself.
 The library is shipped as a JavaScript file \texttt{shippy.js} to be included in HTML files of the Web app.
 When loaded, all functionality is exposed on a JavaScript object \texttt{Shippy} that resides as a property on the browser's global \texttt{window} object.
@@ -24,21 +24,18 @@ These characteristics will remain within the library and only changes to the cur
 \begin{lstlisting}[caption={\APIName API},label={lst:api}]
 Shippy.register(serviceName, {
     init: function
-    operations: <object:string=>function>
-});
+    operations: <object:string=>function> });
 Shippy.call(operationName:string, operationData:object);
 Shippy.on(eventName:string, callback:function);
 \end{lstlisting}
 
-Usage of the API is best described with the \textit{QueueApp} example from section~\ref{sec:motivating_example}.
+Usage of the API is best described with the \texttt{QueueApp} example from section~\ref{sec:motivating_example}.
 The app declares a function \texttt{init} that describes how the initial state (initially an empty object) should be changed.
 In the case of our QueueApp the state will contain a simple array for the queue.
-Listing~\ref{lst:init} shows how this \textit{queue} variable is added to the state object.
+Listing~\ref{lst:init} shows how this \texttt{queue} variable is added to the state object.
 
 \begin{lstlisting}[caption={QueueApp init function},label={lst:init}]
-let init = function(state) {
-    state.queue = [];
-};
+let init = function(state) { state.queue = []; };
 \end{lstlisting}
 
 The operations of the QueueApp are addition and removal of names to and from the queue.
@@ -49,25 +46,21 @@ Listing~\ref{lst:operations} shows code snippets for the operations of the Queue
 \begin{lstlisting}[caption={QueueApp operations},label={lst:operations}]
 let operations = {
     add: function(state, params) {
-    //add params.name to state.queue if not existing
-    },
+    /*add params.name to state.queue if not existing*/},
     remove: function(state, params) {
-    //remove params.name from state.queue if existing
-    }
+    /*remove params.name from state.queue if existing*/}
 };
 \end{lstlisting}
 
 The declared \texttt{init} function and \texttt{operations} object are then registered at the Shippy framework by calling \texttt{Shippy.register}.
 Listing~\ref{lst:register} shows the QueueApp register function.
 The first argument will be the name of the service to be advertised in the local network for the app, \textit{QueueApp} in our case,
- while the second argument contains the app init function and its set of operations.
+ while the second argument contains the app init function and its set of operations (note that we refer to the previously declared variables as property values).
 
 
 \begin{lstlisting}[caption={Shippy.register},label={lst:register}]
 Shippy.register("QueueApp", {
-    init: init,
-    operations: operations
-});
+    init: init, operations: operations });
 \end{lstlisting}
 
 Once the app is registered and a node is connected as client, operations can be invoked with \texttt{Shippy.call}. Listing~\ref{lst:register} shows how the client node for Bob would add its name to the queue.
@@ -75,7 +68,7 @@ Once the app is registered and a node is connected as client, operations can be 
 Shippy.call("add", { name: "Bob" });
 \end{lstlisting}
 
-Underneath, this invocation of \texttt{Shippy.call} will result in a message sent on the WebSocket channel to the current server node (which may be the same as the client).
+Underneath, this invocation of \texttt{Shippy.call} will result in a message sent on the WebSocket channel to the current server node.
 It will contain the operation to be executed, \textit{add}, and the payload \texttt{\{name: "Bob"\}}.
 On the current server node, the operation name will be matched against the set of operations provided earlier with \texttt{Shippy.register}.
 If an operation is found, the respective function is called with the current state object and the received payload (containing the name ``Bob'' in this case) as arguments.
@@ -85,8 +78,7 @@ Listing~\ref{lst:stateupdate} shows the listener for this event in the QueueApp.
 
 \begin{lstlisting}[caption={stateupdate listener},label={lst:stateupdate}]
 Shippy.on("stateupdate", function(state) {
-// update app based on new operation (e.g. UI changes)
-});
+/* update app based on new op. (e.g. UI changes) */});
 \end{lstlisting}
 
 In addition to the \textit{stateupdate} event, Shippy currently dispatches \textit{connect} and \textit{disconnect} events such that apps can update their interface in accordance with the current network state (e.g. changing background color).

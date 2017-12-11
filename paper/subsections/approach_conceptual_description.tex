@@ -4,9 +4,9 @@
 \textbf{Architecture.} 
 Figure~\ref{fig:stack} shows the \APIName stack.
 On the bottom layer are the \textit{Application layer protocols}.
-The Zeroconf protocols \textit{mDNS} and \textit{DNS-SD} are used for the advertisement and discovery of \APIshort services in the local network\footnote{We do not use these protocols directly but rely on their implementation in FlyWeb.}. 
+The Zeroconf protocols \textit{mDNS} and \textit{DNS-SD} are used for the advertisement and discovery of \APIshort services in the local network. 
 In terms of application-level network communication we use the common protocols of \textit{WebSocket} and \textit{HTTP}. 
-The initial request to a \APIshort app is in form of a \textit{HTTP GET} request and associated requests for static resources.  Clients then establish a stable \textit{WebSocket} channel that is used for further communication between nodes (e.g. state replication). 
+The initial request to a \APIshort app is in form of a \textit{HTTP GET} request and associated requests for static resources.  Clients then establish a stable \textit{WebSocket} channel that is used for further communication between nodes (e.g. for state replication). 
 Above the application layer protocols is the \textit{FlyWeb} layer. 
 We use FlyWeb as a library for facilitating interaction with the Zeroconf protocols. 
 \APIName was designed with as few connection points with FlyWeb as possible such that this dependency can be easily replaced with a different implementation in the future. 
