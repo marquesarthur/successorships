@@ -2,14 +2,14 @@
 \label{sub:eval:connection}
 
 
-We define client connection as the amount of time it takes for a device to connect, as a client, to a published server.
+We define client connection as the amount of time it takes for a device to connect, as a client node, to a published server.
 This connection time takes into account not only the time it takes for that client to connect to the server, 
 but also the time it takes for that client to have its own copy of the server state. 
 To do so, we measured events related to client connection, server welcoming message, and the first message for that client that carried the server state.
 
 
 Figure~\ref{fig:client-welcome} presents the cumulative empirical function for client connection.
-On average, clients are fully connected to a publisher server in 11 seconds. 
+On average, clients are fully connected to a publisher server in 11 seconds ($\rpm$ 16 seconds). 
 The majority of the clients (80\%) were able to establish a connection under 15 seconds, 
 but we noticed some cases were clients took longer to connect. 
 Inspecting this corner case scenarios, we identified that they were mostly related to cases were the state was larger than 1MB.
@@ -24,12 +24,14 @@ In other cases were this affirmation did not hold, we hypothesize that the hotsp
 \end{figure}
 
 
-In order to further investigate client connection properties, we investigate whether the number of connected devices or the server state size influences connection time.
-Figure~\ref{fig:client-welcome-successors} presents a boxplot chat about the connection time grouped by the number of successors.
-Despite the fact that all connected clients receive a state update with a new successorship list including the new connected client, 
+In order to further investigate client connection properties, we analyzed whether the number of connected devices or the server state size influences connection time.
+Figure~\ref{fig:client-welcome-successors} presents a boxplot chart for the connection time grouped by the number of successors.
+Despite the fact that all connected clients receive a state update with the newest successorship list, 
 we could not see how the number of successors influences a new client connection and all boxplot charts overlap.
-On the other hand, Figure~\ref{fig:client-welcome-state-size} models time as a linear function of the server state size in bytes.
+On the other hand, Figure~\ref{fig:client-welcome-state-size} models time as a linear function of the server state size.
 Intuitively, as the server state increases in size, clients take longer to connect. 
+This give us insights about benefits and limitations of our current implementation.
+Based on client connection measurements, we posit that \APIshort could scale with more connect devices, though the state variable is a bottleneck and applications that require a larger state are compromised.
 
 
 \begin{figure}
@@ -42,6 +44,7 @@ Intuitively, as the server state increases in size, clients take longer to conne
 \begin{figure}
     \centering
     \includegraphics[width=0.9\linewidth]{client-welcome-state-size}
-    \caption{Client time to connect as a function of the server state}
+    \caption{Client time to connect as a function of the server state size}
     \label{fig:client-welcome-state-size}
 \end{figure}
+
