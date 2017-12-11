@@ -8,7 +8,7 @@ Each time the state is changed on the server node, the state's version is increm
 The current state is obtained initially by clients triggered by the first handshake with the current server: whenever a new client connects, a WebSocket \texttt{open} event is triggered on the server and a new unique client ID is added to the \texttt{successors} list in the global state object.
 The changed state is then broadcasted to all clients\footnote{Note that we are broadcasting the full state in this case rather than a single operation.
 A possibly better solution could be that we broadcast only a \texttt{successoradded} operation to all clients except the new one and include the full state for the new client in the \texttt{welcome} message along with the newly created client ID.}, including the new one.
-This ensures that any new client is up-to-date shortly after connecting and all other clients will have the new client in their \texttt{successors} list.
+This ensures that any new client is up-to-date shortly after connecting and that all other clients will have the new client in their \texttt{successors} list.
 After a client is connected, it can invoke state changes on the server by invoking \texttt{Shippy.call} which will result in a WebSocket message to the server where the submitted operation is applied.
 After an operation was applied on the server, this operation is broadcasted to all clients in the order as they appear in the \texttt{successors} list in the shared state.
 
@@ -22,7 +22,7 @@ In the current \APIshort implementation, we consider clients being ``ahead'' of 
 
 
 \textbf{Reaching consensus.}
-We leverage the concepts of \textit{eventual consistency} and \textit{lazy replication} in \APIshort.
+We leverage the concepts of \textit{eventual consistency} and \textit{lazy replication} in Shippy.
 We argue that our domain of local ad-hoc offline Web applications will mostly tolerate minor time frames of inconsistent states and we therefore focus on availability and performance rather than accepting the overhead induced by stronger consistency principles.
 With the replication strategy previously described, the state manipulation can only happen on the current server and clients are only notified of changes applied on the server.
 The most obvious source for inconsistencies would be lost messages carrying operations from server to client and vice versa.
