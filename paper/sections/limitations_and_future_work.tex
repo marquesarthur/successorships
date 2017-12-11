@@ -1,2 +1,32 @@
 \section{Limitations and Future Work}
 \label{sec:limitations_and_future_work}
+
+
+% ===
+% Felix: below is just a random collection of notes I took during writing other parts
+
+% LIMITATIONS:
+% all services are published to web apps
+% ip + port => no hostnames
+% only mac
+% time to recovery
+% weak consistency
+% server: prevent second fetch 
+
+% LIMITATION
+% sometimes broadcast whole state
+% async state updates => could wait for first succ's ack
+
+%In the current implementation, the full state is broadcasted when a new client connects. This could be improved in the future by broadcasting only a 
+
+% LIMITATIONS
+%In certain failure cases where a client state is newer than a server state, clients can essentially \textit{overwrite} the server state.
+%This opens up the risk of being spoofed by malicious clients imposing a manipulated state onto our network, but as stated previously, we allow ourselves to assume full trust between all participants in the network.
+%We have considered using a \textit{CRDT} for our implementation, but we believe that the constraint of commutativity of operations, or associativity of merging conflicting states, is potentially too restricting for the range of applications we would want to allow to run on our framework.
+%We have also considered to notify the first client in the \texttt{successors} list and only broadcast to other clients when an acknowledgement was received.
+%We faced technical difficulties with this strategy and were not convinced enough of the benefits to justify further efforts.
+
+% LIMITATIONS
+% transmission queue
+
+% We considered starting the next server immediately subsequent to a WebSocket close event, but restrained from this approach being too error-prone. For example, a simple page reload on the current server would trigger a WebSocket \texttt{close} event on all clients and one of them immediately becoming the next server. This would introduce another race condition between the first successor and the original server that registers itself again immediately after page reload. Our existing approach deals with this problem much more gracefully: the original server will simply remain the server because the set of current services is updated only in much longer intervals. The downside of our approach is a significantly increased time of recovery.
