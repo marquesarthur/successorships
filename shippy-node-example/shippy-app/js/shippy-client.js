@@ -49,7 +49,7 @@ Shippy.Client = (function() {
 
 	// it will check whether the server has a state newer then the client
 	// If it does, it will apply the state update function
-	// Otherwise, it will send a _mostuptodate message back to the server
+	// Otherwise, it will send a _aheadofserver message back to the server
 	function updateState(body) {
 		let currentState = Shippy.internal.state();
 		if (isServerAhead(body)){
@@ -72,7 +72,7 @@ Shippy.Client = (function() {
 				tempID: tempID,
 			});
 		} else {
-			Shippy.Util.wsSend(ws, "_mostuptodate", {state: currentState});
+			Shippy.Util.wsSend(ws, "_aheadofserver", {state: currentState});
 		}
 	}
 
