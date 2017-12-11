@@ -1,2 +1,20 @@
 \section{Related Work}
 \label{sec:related_work}
+
+\textbf{Zeroconf.}
+Several researchers propose have investigated Zeroconf~\cite{Gunes2002, Bohnenkamp2003, Jara:2012:IPv6DNS-SD}.
+For instance, \cite{hong2007accelerating} discusses that Zeroconf service discovery may cause overheads to the network while discovering new services.
+Thus, proposing an algorithm to accelerate service discovery based on network topology changes.
+Since a server failure would imply a change in the network topology, i.e. the server node being removed from the topology, 
+client nodes our implementation could use their approach to accelerate service discovery. 
+Nonetheless, their implementation used a LINUX Wireless extensions, which may not be accessible within a browser.
+Thus, we used the FlyWeb service discovery implementation.
+
+In~\cite{stolikj2016context}, Stolikj et al. argue that the number of published services in a network may also slow down service discovery.
+As a solution, they propose a context based approach, where queries specify which services they are interested in.
+This context based approach is highly suitable for our work and we could use it to filter \APIshort services.
+However, their approach changes service discovery queries and we question whether this could be easily integrated with existing devices.
+
+
+\textbf{Zeroconf.}
+
