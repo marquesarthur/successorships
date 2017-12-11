@@ -85,13 +85,11 @@ The created ID is sent to the new client as the second part of the handshake.
 The client node then saves that its ID such that it can be matched against the IDs in the \texttt{successors} list.
 
 \noindent\textbf{Client succession.} 
-
 Whenever the current server fails, a successor must be chosen. 
 To do so, clients nodes match their ID against the ones in the \texttt{successors} list.
 If their ID matches the first ID in the successor, then that node will become a server node.
 Otherwise, it will wait for the new server and connect to it as a client once again.
-
-Considering the scenario previously depicted in Figure~\ref{fig:roles}, suppose that the server \texttt{A} fails. In this scenario, connected clients \texttt{B} to \texttt{n} detect that failure and match their ID against the ones in the list of successors, as presented in Figure~\ref{fig:succession}. Node \texttt{B} will become a server node while other clients will wait and connect to it as clients.
+Considering a server node and clients nodes as depicted in Figure~\ref{fig:roles}, suppose that the server \texttt{A} fails. In this scenario, connected clients \texttt{B} to \texttt{n} detect that failure and match their ID against the ones in the list of successors, as presented in Figure~\ref{fig:succession}. Node \texttt{B} will become a server node as its ID matches the one for the first successor while other nodes will wait and connect to \texttt{B} as clients nodes.
 
 \begin{figure}[h]
     \centering
@@ -101,12 +99,12 @@ Considering the scenario previously depicted in Figure~\ref{fig:roles}, suppose 
 \end{figure}
 
 \noindent\textbf{Server implementation.}
-\APIName uses the concept of an in-browser Web server based on the \texttt{navigator.publishServer} implementation in FlyWeb.
+\APIName uses the concept of an in-browser Web server based on the \texttt{navigator.publishServer} implementation in FlyWeb\footnote{https://github.com/flyweb/spec}.
 This implementation provides an API for received \textit{HTTP GET} requests and \textit{WebSocket} messages.
 Since any Web application relies on static resources (e.g. js, css, images) our FlyWeb server implementation must be able to load and serve these resources when requested by clients.
-The documentation of FlyWeb\footnote{https://flyweb.github.io/posts/2016/11/01/introducing-flyweb.html, accessed 2017-12-09} describes that this can be achieved with a call of \texttt{fetch} provided by the browser's \textit{Fetch API}\footnote{https://developer.mozilla.org/en-US/docs/Web/API/Fetch\_API, accessed 2017-12-09}.
+The documentation of FlyWeb\footnote{https://flyweb.github.io/posts/2016/11/01/introducing-flyweb.html, accessed 2017-12-09} describes that this can be achieved using browser's \textit{Fetch API}\footnote{https://developer.mozilla.org/en-US/docs/Web/API/Fetch\_API, accessed 2017-12-09}.
 However, this is essentially just a redirect to the Web app that served the FlyWeb app at the first place.
-This is a problem for our scenario since the original Web app is not known to clients that took over the server role from another node\footnote{Also, we want to support scenarios where only the first client has access to the original Web app that bootstraps the FlyWeb application and clients subsequently only need access to the node that became the first FlyWeb server.}.
+Since, after a failure, the original Web app and its static resources will not be available to clients that took over the server role from another node \APIshort must store static resources at every node\footnote{Also, we want to support scenarios where only the first client has access to the original Web app that bootstraps the FlyWeb application and clients subsequently only need access to the node that became the first FlyWeb server.}.
 We solved this problem by storing all resources required for the \APIshort app in the browser's \texttt{sessionStorage}\footnote{https://developer.mozilla.org/de/docs/Web/API/Window/sessionStorage, accessed 2017-12-09.} that is persistent for the duration of the current browser session.
 In the current implementation, all resources obtained upon load of the app are scanned for referenced resources.
 These are then fetched\footnote{In the future we aim to omit these secondary requests with a strategy of accessing these resources from the browser's native storage (see section~\ref{sec:limitations_and_future_work}).} and stored in \texttt{sessionStorage}.

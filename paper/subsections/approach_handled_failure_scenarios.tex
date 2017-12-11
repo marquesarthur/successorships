@@ -8,13 +8,13 @@ We address these in section~\ref{sec:limitations_and_future_work}.
 While disconnecting clients are mostly a trivial circumstance in traditional Web apps, they are more complex in \APIshort apps because the system relies on clients being represented in the shared \texttt{successors} list. 
 A disconnecting client will trigger a \texttt{close} event on the current server for the associated WebSocket channel and the disconnected client's ID is obtained. 
 The ID is then removed from the \texttt{successors} list on the shared state and the update is broadcasted. 
-If the disconnected client was the first element in the \texttt{successors} list, the list will be shifted and the second element will be the new first successor.
+If the disconnected client was the first element in the \texttt{successors} list, the list will be shifted and the second element will be the new successor.
 
 \textbf{Server disconnection.} 
 A disconnected server will result in a WebSocket \texttt{close} event triggered at each connected client. 
-After some time, the service discovery mechanism described in section~\ref{sub:approach_conceptual_description} will reveal that there is no more service currently registered with the app's service name. 
+After some time, the service discovery mechanism described in Section~\ref{sub:approach_conceptual_description} will reveal that there is no more service currently registered with the app's service name. 
 This is the time when one of the previously connected client nodes will become the next server\footnote{We considered starting the next server immediately subsequent to a WebSocket close event but restrained from this approach, considering it too error-prone. For example, a simple page reload on the current server would trigger a WebSocket \texttt{close} event on all clients and one of them immediately becoming the next server. This would introduce another race condition between the first successor and the original server that registers itself again immediately after page reload. Our existing approach deals with this problem much more gracefully: the original server will simply remain the server because the set of current services is updated much less frequently. The downside of our approach is a significantly increased time of recovery. See section~\ref{sec:limitations_and_future_work} for further details.}: each client compares the first item in the shared \texttt{successors} list with its ID (obtained with the \texttt{welcome} message of the initial handshake). 
-If it matches, the client will publish a server as described in section~\ref{sub:approach_conceptual_description}. 
+If it matches, the client will publish a server as described in Section~\ref{sub:approach_conceptual_description}. 
 Otherwise, it will continue listening for service discovery events until a service with the app's name is available and connect to it.
 
 \textbf{Simultaneous disconnection.} 
