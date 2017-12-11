@@ -43,10 +43,10 @@ For each one of the events presented in the Table~\ref{tbl:eval:experiment_summa
 Each logged event is a tuple that contains at least an event name, device unique identifier, and a timestamp representing the milliseconds elapsed since the \texttt{UNIX} epoch.
 
 
-As an example, whenever a running server disconnects, our instrumented application logs an event of ``{\texttt{disconnecting}}'', which is followed by a successor device responding with a ``{\texttt{become\_server\_begin}}'' and either a ``{\texttt{become\_server\_end}}'' or ``{\texttt{become\_server\_error}}'' after the function's execution. This events are chronologically sorted, as depicted in the Listing~\ref{lst:events}, and we compute the elapsed time between them.
+As an example, whenever a running server disconnects, our instrumented application logs an event of ``{\texttt{disconnecting}}'', which is followed by a successor device responding with a ``{\texttt{become\_server\_begin}}'' and either a ``{\texttt{become\_server\_end}}'' or ``{\texttt{become\_server\_error}}'' after the function's execution. This events are chronologically sorted, as depicted in the Listing~\ref{lst:events:server-recovery}, and we compute the elapsed time between them.
 
 \begin{tiny}
-\begin{lstlisting}[caption={Tuples with logged events},label={lst:events}, language=JavaScript]
+\begin{lstlisting}[caption={Tuples with logged events},label={lst:events:server-recovery}, language=JavaScript]
 (timestamp, event, deviceID, server)
 (1512766249862, "disconnecting", 15127210, true),
 (1512766265059, "become_server_begin", 15223107, false),
