@@ -5,6 +5,7 @@ node_modules/
 shippy-measurement/output/*
 shippy-measurement/input/*
 .RHistory
+.RData
 
 # BEGIN: Paper/Latex stuff
 *.acn
