@@ -6,8 +6,7 @@ All \APIshort nodes share a versioned global state during the lifetime of the ap
 The app is ``alive'' as long as there is one node that advertises the app's service in the local network.
 Each time the state is changed on the server node, the state's version is incremented.
 The current state is obtained initially by clients triggered by the first handshake with the current server: whenever a new client connects, a WebSocket \texttt{open} event is triggered on the server and a new unique client ID is added to the \texttt{successors} list in the global state object.
-The changed state is then broadcasted to all clients\footnote{Note that we are broadcasting the full state in this case rather than a single operation.
-A possibly better solution could be that we broadcast only a \texttt{successoradded} operation to all clients except the new one and include the full state for the new client in the \texttt{welcome} message along with the newly created client ID. We come back to this problem in section~\ref{sec:limitations_and_future_work}.}, including the new one.
+The changed state is then broadcasted to all clients, including the new one.
 This ensures that any new client is up-to-date shortly after connecting and that all other clients will have the new client in their \texttt{successors} list.
 After a client is connected, it can invoke state changes on the server by calling \texttt{Shippy.call} which will result in a WebSocket message to the server where the submitted operation is applied.
 After an operation was applied on the server, this operation is broadcasted to all clients in the order as they appear in the \texttt{successors} list in the shared state.
