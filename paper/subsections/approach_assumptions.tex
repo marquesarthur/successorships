@@ -1,5 +1,5 @@
-\subsection{Goals and Assumptions}
-\label{sub:approach_goals_and_assumptions}
+\subsection{Assumptions}
+\label{sub:assumptions}
 
 We make some strongly simplifying \textit{assumptions} in the first version of \APIName to make initial design and implementation tractable. In particular, we assume the following, being aware of necessary improvements for a productive version of our implementation.
 
@@ -13,4 +13,4 @@ A core requirement of our model is that the server be able to broadcast its chan
 Therefore, we assume that communication in the network is not traffic intensive, i.e. nodes neither produce bursts of requests in a small period of time, nor do they have payloads higher than some threshold $\tau$ that might generate bottlenecks in the network.
 
 \textit{Assumption 3: Applications are restricted to a client-server model with one state object.}
-\APIshort apps follow a client-server model and are built using one shared object. While this may sound very limiting at first, we can see this becoming a norm in modern Web applications, especially with the popularity of frontend frameworks like React\footnote{https://reactjs.org/} and Redux\footnote{https://redux.js.org/docs/introduction/}. In these frameworks, any change in the application's frontend is triggered by an operation on a single state object. We posit that \APIshort aligns very well with these frameworks and consider this design choice well-justified.
+\APIName apps follow a client-server model and are built using one shared object. While this may sound very limiting at first, we can see this becoming a norm in modern Web applications, especially with the popularity of frontend frameworks like React\footnote{https://reactjs.org/} and Redux\footnote{https://redux.js.org/docs/introduction/}. In these frameworks, any change in the application's frontend is triggered by an operation on a single state object. We posit that \APIName aligns very well with these frameworks and consider this design choice well-justified.
