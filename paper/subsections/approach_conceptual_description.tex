@@ -56,7 +56,7 @@ The decision of whether to become a server is first triggered when (1) \textit{t
 This decision is then repeated (2) any time a \textit{discovery event} occurs and there is \textit{no such service}. 
 In both cases, the node will become a server if \textit{either} of the following conditions is true:
 \begin{itemize}
-    \item The \texttt{successors} list is empty \textit{and} this node loaded the application initially\footnote{This is determined by whether the application is currently served by a FlyWeb server node or by other means, e.g. a Web application or a simple HTML file from the file system.}.
+    \item The \texttt{successors} list is empty \textit{and} this node loaded the application initially.
     \item The \texttt{successors} list is not empty \textit{and} the first item in the list refers to this client.
 \end{itemize}
 
