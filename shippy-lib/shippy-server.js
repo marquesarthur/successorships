@@ -20,7 +20,7 @@ Shippy.Server = (function() {
 			// Should we trigger a broadcast here? I think I will always be the first client when I reveal
 			// myself but I'm not really sure.
 		},
-		_mostuptodate: function (state, params) {
+		_aheadofserver: function (state, params) {
 			// This route is called when upon connection, a client signals that it has the most up-to-date state
 			// In that case, the server needs to make a copy of his list of successors and then, update the state based on what he received from the client
 			// This is not optimal. Ideally, instead of sending the most up-to-date state,
@@ -48,11 +48,16 @@ Shippy.Server = (function() {
 		let url = event.request.url;
 		let file = Shippy.Storage.get(url);
 		if (file) {
-			event.respondWith(new Response(file.content, createOptions(file.mimeType)));
+			let options = createOptions(file.mimeType);
+			if (url === '/' || url === '/index.html') {
+				event.respondWith(new Response(file.content, options));
+			} else {
+				let blob = Shippy.Util.dataURItoBlob(file.content);
+				event.respondWith(new Response(blob, options));
+			}
 		} else {
 			event.respondWith(new Response({}, createOptions('application/json', 404)));
 		}
-
 	}
 
 	// Run through all WS connections and send the state.
@@ -89,6 +94,7 @@ Shippy.Server = (function() {
 			let clientId = new Date().getTime();
 			ws.clientId = clientId;
 			wss[clientId] = ws;
+			Trace.log({ timestamp: Date.now(), event: 'shippy_server_ws_open', source: Shippy.internal.clientId(), from: ws.clientId});
 			Shippy.internal.addSuccessor(clientId);
 			Shippy.Util.wsSend(ws, "welcome", {clientId: clientId});
 			broadcastState();
@@ -100,6 +106,10 @@ Shippy.Server = (function() {
 			Shippy.Util.log("SERVER: MESSAGE");
 			let data = Shippy.Util.wsReceive(e);
 			let currentState = Shippy.internal.state();
+
+			if (ws.clientId){
+				Trace.log({ timestamp: Date.now(), event: 'shippy_server_received_'+data.route, source: Shippy.internal.clientId(), from: ws.clientId, pkgSize: Shippy.Util.payloadSize(data)});
+			}
 
 			routes[data.route] && routes[data.route](currentState, data.body);
 
@@ -120,6 +130,7 @@ Shippy.Server = (function() {
 		ws.addEventListener("close", function(e) {
 			Shippy.Util.log("SERVER: CLOSE");
 			if (ws.clientId) {
+				Trace.log({ timestamp: Date.now(), event: 'shippy_server_ws_close', source: Shippy.internal.clientId(), from: ws.clientId});
 				delete wss[ws.clientId];
 				Shippy.internal.removeSuccessor(ws.clientId);
 				broadcastState();
@@ -136,9 +147,11 @@ Shippy.Server = (function() {
 	// Don't really know what to do here
 	function onClose() {
 		Shippy.Util.log("ON CLOSE");
+		Trace.log({ timestamp: Date.now(), event: 'shippy_server_disconnecting', source: Shippy.internal.clientId()});
 	}
 
 	function becomeServer() {
+		Trace.log({ timestamp: Date.now(), event: 'shippy_become_server_begin', source: Shippy.internal.clientId()});
 		// Mount the routes for the app operations onto our WS routes.
 		routes = Object.assign(routes, Shippy.internal.appSpec().operations);
 		Shippy.Util.log("BECOME SERVER");
@@ -153,8 +166,10 @@ Shippy.Server = (function() {
 			server.onwebsocket = onWebsocket;
 			server.onclose = onClose;
 			Shippy.Util.log(server);
+			Trace.log({ timestamp: Date.now(), event: 'shippy_become_server_end', source: Shippy.internal.clientId()});
 		}).catch(function (err) {
 			Shippy.Util.log("Error creating server", err);
+			Trace.log({ timestamp: Date.now(), event: 'shippy_become_server_error', source: Shippy.internal.clientId()});
 		});
 	}
 

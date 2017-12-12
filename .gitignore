@@ -2,8 +2,12 @@
 node_modules/
 .idea/
 **/.idea/
-# BEGIN: Paper/Latex stuff
+shippy-measurement/output/*
+shippy-measurement/input/*
+.RHistory
+.RData
 
+# BEGIN: Paper/Latex stuff
 *.acn
 *.acr
 *.alg

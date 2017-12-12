@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html data-flyweb-role="server">
+
+<head>
+    <title>Shippy Sample App</title>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" type="text/css" href="css/app.css">
+</head>
+
+<body>
+
+    <div id="main">
+        <div>Name: <span id="myname"></span></div>
+        <div>State: <span id="state"></span></div>
+        <a id="add-button" href="#">Add</a>
+        <a id="remove-button" href="#">Remove</a>
+        <div id="connection-status">Connected?</div>
+    </div>
+    <hr>
+    <div>
+        <div>myID: <span id="myID"></span></div>
+        <div>Server: <span id="server"></span></div>
+        <div>Next: <span id="next"></span></div>
+        <div>URL: <a id="url" href="" target="_blank">NONE</a></div>
+    </div>
+
+    <!-- Just for some DOM manipulation because we're fast with jQuery -->
+    <script src="js/jquery.js"></script>
+    <!-- The Shippy library -->
+    <script src="js/shippy.js"></script>
+    <!-- Our queue app that doesn't know what's going on in shippy -->
+    <script src="js/app.js"></script>
+
+</body>
+
+</html>
