@@ -106,7 +106,7 @@ However, this is essentially just a redirect to the Web app that served the FlyW
 Since, after a server failure, the original Web app and its static resources will not be available to clients that took over the server role from another node, \APIshort must store static resources at every node\footnote{Also, we want to support scenarios where only the first client has access to the original Web app that bootstraps the FlyWeb application and clients subsequently only need access to the node that became the first FlyWeb server.}.
 We solved this problem by storing all resources required for the \APIshort app in the browser's \texttt{sessionStorage}\footnote{https://developer.mozilla.org/de/docs/Web/API/Window/sessionStorage, accessed 2017-12-09.} that is persistent for the duration of the current browser session.
 In the current implementation, all resources obtained upon load of the app are scanned for referenced resources.
-These are then fetched\footnote{In the future we aim to omit these secondary requests with a strategy of accessing these resources from the browser's native storage (see section~\ref{sec:limitations_and_future_work}).} and stored in \texttt{sessionStorage}.
+These are then fetched and stored in \texttt{sessionStorage}.
 Subsequently, when \APIshort request static resources, these can be simply obtained from \texttt{sessionStorage} and served without any access to the original Web app.
 
 
