@@ -94,8 +94,8 @@ Applications operating in zeroconf settings often face the challenge of maintain
 Fault-tolerance is thus a desirable property for such applications, but it can be difficult to achieve in practice.
 To this end, we introduce Successorships, a JavaScript library that provides the appealing qualities of zeroconf enriched with fault-tolerance, to applications running in the browser.
 Our library enables graceful recovery after server failure by handing over the server role to one of the clients currently in the network.
-We evaluate our approach with a sample application, focusing on usage scenarios that involve interactions between users walking in and out of a single room. 
-We find that our library recovers from failures gracefully after an average of 20 seconds, and that application state is maintained with eventual consistency.
+We evaluate our approach with a sample application, focusing on usage scenarios that involve interactions between users in a small mobile network. 
+We find that our library recovers from failures gracefully under an average of 15 seconds, and that the application state is replicated under 11 seconds, thus nodes running a Successorships app eventually reach consistency.
 \end{abstract}
 
 \maketitle
