@@ -5,15 +5,10 @@ Hosts connected to a network rely on maintaining a common consensus on such basi
 This need is often fulfilled by specially-designated configuration servers, such as DHCP or DNS servers.
 However, such servers can be absent in common networking situations, such as \textit{ad hoc} networks.
 In such cases, it remains desirable for hosts to handle these matters in a seamless and cross-platform fashion, without the need for manual configuration.
-This is the problem addressed by the group of protocols referred to as Zeroconf, short for ``Zero Configuration Networking''.
-Although the term is sometimes used more broadly to designate any suite of technologies that seeks to address this problem, we observe the more specific meaning established by the former IETF Working Group by the same name\footnote{http://www.zeroconf.org/}.
-Zeroconf protocols solve the problems of address allocation (IPv4LL), address queries (mDNS), and network service discovery (DNS-SD), specifically when hosts share a direct link (be it logical or physical).
- 
-\textbf{Address allocation.}
-When a client running DHCP connects to a network managed by a DHCP server, the server assigns to the client an available IP address in the local network.
-A Zeroconf protocol called IPv4LL (short for IPv4 Link Local) is intended for use in the absence of such a server.
-IPv4LL specifies how a connecting client may check directly the availability of an IPv4 address before claiming it on that local network, and specifies how to resolve conflicts between two or more hosts having claimed the same address~\cite{rfc3927}.
-IPV4LL has been integrated into consumer operating systems and printers since the early 2000s.
+This is the problem addressed by the group of protocols referred to as Zeroconf, short for ``Zero Configuration Networking''.\footnote{Although the term is sometimes used more broadly to designate any suite of technologies that seeks to address this problem, we observe the more specific meaning established by the former IETF Working Group by the same name.
+See e.g. \url{http://www.zeroconf.org/}.}
+Zeroconf protocols solve the problems of address allocation, address queries (mDNS), and network service discovery (DNS-SD), specifically when hosts share a direct link (be it logical or physical).
+Since the first of these (address allocation) is a \textit{de facto} standard, as it has been integrated into consumer operating systems and printers since the early 2000s, we focus on the latter of these two here.
 
 \textbf{Address queries.}
 A name server can be used on a local network to maintain a mapping of logical names to IP addresses.

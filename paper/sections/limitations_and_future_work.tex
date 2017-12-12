@@ -19,7 +19,7 @@ We clearly accepted a few security concerns for the \APIName proof of concept bu
 
 \textbf{Consistency guarantees.}
 As described in section~\ref{sub:approach_replication_strategy} we built \APIName on the concepts of eventual consistency and lazy replication. 
-This approach will tolerate inconsistencies between participants to some degree with the assumption of reaching consensus when the system ``quiesce'' for a period of time. 
+This approach will tolerate inconsistencies between participants to some degree with the assumption of reaching consensus when the system ``quiesces'' for a period of time. 
 We acknowledge that this model may not be sufficient for some applications. 
 We have considered to notify the first client in the \texttt{successors} list and only broadcast updates to other clients when an acknowledgement was received.
 We faced technical difficulties with this strategy and restrained from an implementation of the idea.
