@@ -1,2 +1,11 @@
 \section{Conclusion}
 \label{sec:conclusion}
+
+As networking capabilities become more ubiquitous across different types of devices, applications that communicate over local area networks become more common.
+Using a proper suite of networking protocols and technologies, these applications can discover other devices in the network and exchange data with them.
+One appealing way to build such apps is using zeroconf networks and web browsers.
+Nonetheless, applications operating in zeroconf still face normal challenges imposed by the type of network that they operate on, e.g. 
+unstable wireless links or host mobility. Also, developers have little to no browser API support for these technologies.
+
+
+To address the aforementioned issues, we proposed \APINameNoSpace, which abstracts and decouples zeroconf logic from the application logic and seamlessly integrates fault-tolerance to applications that require a state but face failures due to intermittent connectivity. We evaluated \APIName by measuring network traffic and state recovery in face of failures in proof of concept applications. \APIName supports all its intended use cases and future work will improve bottlenecks identified during our evaluation.
