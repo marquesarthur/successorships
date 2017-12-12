@@ -1,34 +1,35 @@
 \section{Introduction}
 \label{sec:introduction}
 
-There has been an increasing trend of applications that communicate over local area networks in recent years; prominent examples include Apple Bonjour, Spotify Connect, Google Chromecast and ad-hoc Wi-Fi printers.
+In recent years, applications that communicate over local area networks have become increasingly prevalent; prominent examples include Apple Bonjour, Spotify Connect, Google Chromecast and ad-hoc Wi-Fi printers.
 This trend has been accelerated not only by the proliferation of ``smart'' devices, but also by the adoption of standards that eliminate the burden of manually configuring devices in a network.
 Zero-configuration networking has become one of the most widely adopted such standards, and its suite of protocols allows devices to automatically discover other devices or peripherals in a network as well as their offered services~\cite{rfc6762, rfc6763}.
 
-
 While most applications are shipped with specific hardware/software to publish and discover services in a network, this can be done programmatically and one can devise new applications that communicate within a local area network.
 As an example, browser vendors are integrating this technology and delivering a new set of Web applications built on top of Zeroconf.
-Indeed, the characteristics of Web applications are appealing for Zeroconf applications, being irrespective of traditional installation models, browser-capable devices may become the only requirement for both server and client roles, as is the case in the example of Mozilla FlyWeb.
+Indeed, the characteristics of Web applications are appealing for Zeroconf applications: since they obviate traditional installation models, browser-capable devices may become the only requirement for both server and client roles, as is the case in the example of Mozilla FlyWeb.
 
-While we see strong potential for Zeroconf Web applications, seamlessly being able to discover and connect to other devices and their offered services, we argue that such applications still face the common challenges imposed by the type of network that they operate on.
+While we see strong potential for Zeroconf Web applications, we argue that they still face the common challenges imposed by the type of network in which they operate.
 Specifically, maintaining reliability and consistency in the face of wireless links and mobile devices may result in intermittent connectivity between hosts and unpleasing user experience as a consequence.
-Therefore, we consider fault-tolerance and graceful recovery from failures a highly desirable property for such applications.
+Therefore, we consider fault-tolerance and graceful recovery from failures, a highly desirable property for such applications.
 However, current APIs neither decouple Zeroconf logic from the application logic nor provide fault-tolerance.
 
 To this end, we introduce Successorships, a JavaScript library that provides the appealing qualities of Zeroconf enriched with fault-tolerance, to applications running in the browser.
 Our library enables graceful recovery after server failure by handing over the server role to one of the clients currently in the network.
-By exposing an easy-to-use API, we abstract away the complex details of Zeroconf communication, state replication and consistency and participants’ roles of clients and servers.
-We evaluate our approach with a Successorships application used  in a small mobile network.
+By exposing an easy-to-use API, we abstract away the complex details of Zeroconf communication, state replication and consistency and participants' roles of clients and servers.
+We evaluate our approach with a Successorships application used in a small mobile network.
 Measurements considered 29 server failures and subsequent recoveries.
 Results indicate that usually we are able to recover from failures under 15 seconds.
 Additionally, we discuss characteristics of Successorships network traffic.
 
-The contributions of this paper are as follows:
-Successorships, a JavaScript framework with a simple API that seamlessly enriches Zeroconf Web applications with fault-tolerance through state replication
-A reproducable evaluation methodology for Zeroconf Web applications
-Example applications that demonstrate the benefits and usability of our framework
+We make the following contributions:
+\begin{itemize}
+	\item Successorships, a JavaScript framework with a simple API that seamlessly enriches Zeroconf Web applications with fault-tolerance through state replication
+	\item A reproducable evaluation methodology for Zeroconf Web applications
+	\item Example applications that demonstrate the benefits and usability of our framework
+\end{itemize}
 
-The remainder of this paper is structured as follows: we provide necessary background information on the related areas of Zeroconf, in-browser Web servers and fault-tolerance and in Section 2 and illustrate the need for our approach with one motivating example.
-Section 3 then describes our approach Successorships which we evaluate in Section 4.
-We give insights into where we see the limitations of our approach and how we aim to improve it in the future in Section 5.
-Section 6 puts our paper in the context of related work before Section 7 concludes.
+The remainder of this paper is organised as follows: Section \ref{sec:background} describes the promise of Zeroconf and in-browser Web servers, and motivates the case for extending fault tolerance to applications built on top of these technologies.
+Section \ref{sec:approach} describes our approach, Successorships, which we then evaluate in Section \ref{sec:evaluation}.
+We suggest some limitations of our approach, as well as some ideas for future improvements, in Section \ref{sec:limitations_and_future_work}.
+Section \ref{sec:related_work} situates our work in the context of related research, then Section \ref{sec:conclusion} concludes the paper.
