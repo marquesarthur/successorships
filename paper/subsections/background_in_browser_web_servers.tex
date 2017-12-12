@@ -1,18 +1,23 @@
 \subsection{In-Browser Web Servers}
 \label{sub:background_in_browser_web_servers}
 
-Another recent development in networking technology is the emergence of Web servers that run entirely within a Web browser. 
-The motivation is to simplify the process of serving Web content, thus potentially expanding the breadth of users capable of doing so.
+More recently, a number of technologies have emerged to enable Web servers to be deployed entirely from within Web browsers.
+Such technologies have the appeal that they simplify the process of serving Web content, thus potentially expanding the breadth of users capable of doing so.
+For example, Opera Unite\footnote{http://help.opera.com/Windows/12.10/en/unite.html}, Web Server Chrome\footnote{https://github.com/kzahel/web-server-chrome}, PeerServer\footnote{http://www.peer-server.com/}, and FlyWeb\footnote{http://flyweb.github.io/} all enable browser applications to publish fully functioning Web servers.
 
-An early example of fully in-browser web server technology was \textit{Opera Unite} (2009).
-This extension to the Opera browser enabled users with Opera accounts to serve applications directly from their browsers to anyone on the Web, via a URL pointing to a subdomain on Opera's proxy servers.\footnote{https://maqentaer.com/devopera-static-backup/http/dev.opera.com/articles/view/opera-unite-developer-primer-revisited/index.html}
-Communication between clients and servers in this way could either be direct peer-to-peer, or via Opera Unite's proxy servers.
-Though the service was popular with a sizeable subset of Opera users, especially for purposes such as file sharing and media streaming, Opera eventually retired it in 2012 to consolidate the multiple extension frameworks offered in its browser.\footnote{http://www.instantfundas.com/2012/04/opera-to-discontinue-unite-widgets-and.html}
+HTTP servers running on hosts that usually access the Web as clients face a few challenges not normally encountered by those running on dedicated server machines.
+For example, they must be properly configured to circumvent firewalls, and they must ensure that other clients have a way of finding out their IP address.
+Most in-browser web server frameworks address these issues, albeit in a variety of different ways; we discuss how the FlyWeb project achieves this below, and refer the reader to Section \ref{sec:related_work} for details on other approaches.
 
-\textit{FlyWeb} is a Web API developed by the Mozilla Firefox community that enables clients of Web applications to publish a local server from within the browser.
-Building on the concept of zeroconf networking and its implementation via the mDNS/DNS-SD protocols~\cite{rfc6762, rfc6763}, the server advertises itself in the local network and can be discovered by other devices, which become clients to the server by connecting via a HTTP or WebSocket connection.
-This essentially enables cross-device communication within a local-area network, without any need for an Internet connection.
+\textbf{FlyWeb.}
+The FlyWeb project, developed by the Mozilla Firefox community, addresses the problem of advertising and discovering in-browser Web services in the particular environment of local networks, by leveraging Zeroconf service advertisement and discovery.
+To this end, FlyWeb provides two key pieces of functionality: 
+\textit{(i)} an implementation of mDNS, allowing those services to advertise their name and address to peers on the local network, and 
+\textit{(ii)} a FlyWeb service discovery menu, which uses a built-in implementation of DNS-SD to enumerate locally-discovered services.
+The goal is for devices on a local network to be able to stream applications and content to one another using widely available Web technology.\footnote{https://hacks.mozilla.org/2016/09/flyweb-pure-web-cross-device-interaction/}
 FlyWeb was released in mid-2016, but is no longer actively maintained as of August 2017.
 
-We decided to build our approach on top of FlyWeb, since it is open source and entirely based on Web technology, making it widely available.
-We think that the idea of hosting an ad-hoc network from within a Web application in the browser has great potential, and we think that applications for this network can benefit from graceful recovery upon disconnection of local servers.
+A different challenge facing in-browser Web servers is that their availability is limited by the host machine's uptime.
+Dedicated server machines are usually non-mobile and optimized for availability; however, the class of devices that can run a Web browser is much wider, including mobile devices, hence posing a challenge to service availability.
+To the best of our knowledge, at the time of writing, none of the currently-existing technologies address the issue of recovering from disruptions of server availability for in-browser Web services.
+
