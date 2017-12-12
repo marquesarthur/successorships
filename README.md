@@ -1,32 +1,26 @@
-# Shippy Node Example
+# Successorships
 
-## Prerequisites
+You made it - welcome to a new age of fault-tolerant local Web apps!
 
-1.) Flyweb-enabled Firefox Developer Edition version. I am using 50.0a2 (2016-08-28):
-https://download-origin.cdn.mozilla.net/pub/firefox/nightly/2016/
-=> 2016-08-28-00-40-09-mozilla-aurora
+## Setup
 
-2.) Shippy addon installed. Upload as file in Firefox: shippy-addon/shippy-addon.xpi
+* Make sure you have current versions of Node and NPM installed
+* Install a Flyweb-enabled Firefox Developer Edition. We went with version [50.0a2](https://download-origin.cdn.mozilla.net/pub/firefox/nightly/2016/08/2016-08-28-00-40-09-mozilla-aurora/firefox-50.0a2.en-US.mac.dmg
+)
+* Enable FlyWeb in Firefox
+  * Go to about:config
+  * Search for dom.flyweb.enabled and set it to true
+* Optional for usability: you may also need to add the FlyWeb button to the toolbar
+  * Burger menu => Customize => Drag FlyWeb item to menu bar
+* Install the Shippy addon
+  * Firefox burger menu => Add-ons => Extensions => Configuration dropdown => Install Add-on From File...
+  * Select shippy-addon/shippy-addon.xpi
 
-## Run the example
+## Run the examples
 
-`cd shippy-node-example`
-
-`npm install`
-
-`npm start`
-
-Open the Firefox console and go to http://localhost:3000. Enter your name in the prompt. After some time a
-Flyweb server will be published. Its IP address will be shown in the command line in a message like this:
-
-`Current Flyweb Service: {"serviceUrl":"206.12.64.224:62247","serviceName":"app"}`
-
-The first tab where the server was started will now also become a client. Whenever a client is connected the colored
-box will become green. Otherwise it will be red.
-
-Take the IP:PORT pair and open it in a new tab. They will connect to each other and share the state (the queue and
-the successor list).
-
-Repeat this for a few tabs and names. Then close the first tab with the localhost:3000 address. The "next server"
-will become the new server and the other tabs will connect to it after some time. If you want to open new tabs and
-connect them to the new server, take the new address from the command line again as above.
+* cd into any of the examples in shippy-examples/
+* `npm install`
+* `npm start`
+* Go to http://localhost:3000 using the mentioned Firefox version
+* Open the URL shown in the applications in multiple tabs to see how multiple clients behave
+* Close the first tab and another client will become the server
