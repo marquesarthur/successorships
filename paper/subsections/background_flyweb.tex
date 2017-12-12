@@ -1,0 +1,15 @@
+\subsection{The power of Zeroconf in the browser}
+\label{sec:background_flyweb}
+
+HTTP servers running on hosts that usually access the Web as clients face a few challenges not normally encountered by those running on dedicated server machines.
+For example, they must be properly configured to circumvent firewalls, and they must ensure that other clients have a way of finding out their IP address.
+
+The FlyWeb project, developed by the Mozilla Firefox community, addresses the problem of advertising and discovering in-browser Web services in the particular environment of local networks, by leveraging Zeroconf service advertisement and discovery.
+To this end, FlyWeb provides two key pieces of functionality: 
+\textit{(i)} an implementation of mDNS, allowing those services to advertise their name and address to peers on the local network, and 
+\textit{(ii)} a FlyWeb service discovery menu, which uses a built-in implementation of DNS-SD to enumerate locally-discovered services.
+The goal is for devices on a local network to be able to stream applications and content to one another using widely available Web technology.\footnote{\url{https://hacks.mozilla.org/2016/09/flyweb-pure-web-cross-device-interaction/}}
+%FlyWeb was released in mid-2016, but is no longer actively maintained as of August 2017.
+
+An important part of the appeal of this approach is its sheer versatility: it empowers any Web application with the ability to connect heterogeneous devices over an \textit{ad hoc} network, without each user needing to download a native app for their particular platform.
+Examples of successful demonstrations of this idea include a collaborative photo sharing app, a printer interface, a temperature monitoring interface, and even a quadcopter controller.\footnote{\url{https://github.com/flyweb/examples}}

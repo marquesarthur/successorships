@@ -28,7 +28,10 @@ Since it is much more important that the first successor is up-to-date compared 
 Furthermore, we still broadcast the whole state in certain scenarios.
 This could result in significant traffic on the WebSocket channels that may overwhelm the network for considerable sizes of the state and number of clients. 
 We consider moving to a fully operation-based approach in the future.
-We have also considered using a \textit{CRDT} for our implementation, but we believe that the constraint of commutativity of operations, or associativity of merging conflicting states, is potentially too restricting for the range of applications we would want to allow to run on our framework.
+
+A stronger model of eventual consistency than the one used by Shippy is offered by \textit{conflict-free replicated data types} (CRDTs) \cite{Shapiro:2011}.
+As long as they receive the same updates, no matter the order, any two replicas using CRDTs are guaranteed to converge to the same state.
+We have considered using CRDTs for our implementation, but we believe that the constraint of commutativity of operations, or associativity of merging conflicting states, is potentially too restricting for the range of applications we would want to allow to run on our framework.
 
 Finally, the global state is currently computed any time an operation is received. We consider treating the state as an ordered set of atomic operations such that the state can be re-computed any time by executing all operations from the set. This would improve the consistency guarantees we can provide and establish a basis for at least two more features we have in mind: the merging of multiple servers running in parallel and local operation queues on currently disconnected clients that are sent in batches to the server upon reconnecting.
 

@@ -1,0 +1,22 @@
+\subsection{The need for availability}
+\label{sec:background_motivation}
+
+A different challenge facing in-browser Web servers is that their availability is limited by that of the host machine.
+Dedicated server machines usually have static network addresses and are often streamlined for serving Web content; however, the class of devices that can run a Web browser is much wider, including mobile devices, hence posing a novel challenge to service availability.
+To the best of our knowledge, at the time of writing, none of the currently-existing technologies address the issue of recovering from disruptions of server availability for in-browser Web services.
+
+We argue that application availability in the face of server failure is a requirement for many common use cases of client-server Web applications running on local networks.
+This is especially true when one considers the current prevlance of networked mobile devices, where the server node might leave the local network, or fail due to other reasons such as low battery.
+
+To motivate this concretely, consider a simple queuing Web application called \texttt{QueueApp}, which might be useful in the following scenario: a TA\footnote{Teaching Assistant} holds office hours in a small classroom, and students arrive at random intervals seeking individual assistance.
+Students may arrive at a rate that exceeds that at which the TA is able to address their concerns, and so the TA wishes to keep track of the order in which they arrive.
+The TA takes out her smartphone and loads \texttt{QueueApp}, which immediately starts a Web server on her phone.
+As students arrive, she directs them to the URL of the local \texttt{QueueApp} service; when they connect, they are faced with an interface that enables them to either join the queue if they are not already in it, or to leave it if they are.
+Now, say the TA needs to temporarily leave the room, for example to take an important phone call.
+Unless special functionality is implemented by the application, the clients (students) will get disconnected from the server (TA), and the application state will need to be reset.
+
+We argue that in such a case, it would be of great practical value for \texttt{QueueApp} to continue functioning seamlessly, even in the absence of the initial server.
+What if 5 students enter the room while the TA is out?
+In this paper, we make the case that those students should be able to enqueue despite the absence of the TA.
+
+In the following section, we explain how we achieve this in the \APIName library.

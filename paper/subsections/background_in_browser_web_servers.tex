@@ -4,19 +4,4 @@
 More recently, a number of technologies have emerged to enable Web servers to be deployed entirely from within Web browsers.
 Such technologies have the appeal that they simplify the process of serving Web content, thus potentially expanding the breadth of users capable of doing so.
 For example, Opera Unite\footnote{\url{http://help.opera.com/Windows/12.10/en/unite.html}}, Web Server Chrome\footnote{\url{https://github.com/kzahel/web-server-chrome}}, PeerServer\footnote{\url{http://www.peer-server.com/}}, and FlyWeb\footnote{\url{http://flyweb.github.io/}} all enable browser applications to publish fully functioning Web servers.
-
-HTTP servers running on hosts that usually access the Web as clients face a few challenges not normally encountered by those running on dedicated server machines.
-For example, they must be properly configured to circumvent firewalls, and they must ensure that other clients have a way of finding out their IP address.
-Most in-browser web server frameworks address these issues, albeit in a variety of different ways; we discuss how the FlyWeb project achieves this below, and refer the reader to Section \ref{sec:related_work} for details on other approaches.
-
-\textbf{FlyWeb.}
-The FlyWeb project, developed by the Mozilla Firefox community, addresses the problem of advertising and discovering in-browser Web services in the particular environment of local networks, by leveraging Zeroconf service advertisement and discovery.
-To this end, FlyWeb provides two key pieces of functionality: 
-\textit{(i)} an implementation of mDNS, allowing those services to advertise their name and address to peers on the local network, and 
-\textit{(ii)} a FlyWeb service discovery menu, which uses a built-in implementation of DNS-SD to enumerate locally-discovered services.
-The goal is for devices on a local network to be able to stream applications and content to one another using widely available Web technology.\footnote{\url{https://hacks.mozilla.org/2016/09/flyweb-pure-web-cross-device-interaction/}}
-FlyWeb was released in mid-2016, but is no longer actively maintained as of August 2017.
-
-A different challenge facing in-browser Web servers is that their availability is limited by that of the host machine.
-Dedicated server machines usually have static network addresses and are often streamlined for serving Web content; however, the class of devices that can run a Web browser is much wider, including mobile devices, hence posing a novel challenge to service availability.
-To the best of our knowledge, at the time of writing, none of the currently-existing technologies address the issue of recovering from disruptions of server availability for in-browser Web services.
+We discuss FlyWeb below, and defer details on a few other approaches to Section \ref{sec:related_work}.

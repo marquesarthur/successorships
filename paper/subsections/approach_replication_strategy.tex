@@ -22,7 +22,9 @@ In the current \APIshort implementation, we consider clients being ``ahead'' of 
 
 
 \textbf{Reaching consensus.}
-We leverage the concepts of \textit{eventual consistency} and \textit{lazy replication} in Shippy.
+We leverage the concepts of \textit{eventual consistency} and \textit{lazy replication} in Shippy \cite{Ladin:1990,Ladin:1992}.
+Briefly, this means that nodes holding replicas of the state periodically exchange information, tolerating out-of-sync periods; thus, state may diverge across nodes, but is guaranteed to converge when the system quiesces for some period of time.
+
 We argue that our domain of local ad-hoc offline Web applications will mostly tolerate minor time frames of inconsistent states and we therefore focus on availability and performance rather than accepting the overhead induced by stronger consistency principles.
 With the replication strategy previously described, the state manipulation can only happen on the current server and clients are only notified of changes applied on the server.
 The most obvious source for inconsistencies would be lost messages carrying operations from server to client and vice versa.

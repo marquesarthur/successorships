@@ -1,11 +1,6 @@
 \subsection{Availability and fault tolerance}
 \label{sub:background_replication}
 
-In a fault-tolerant client-server system, the goal is for clients to experience minimal service disruption in the face of a server fault (most commonly, if the server crashes or becomes otherwise disconnected from the network).
-A natural approach to achieving this behaviour is server redundancy, i.e. the use of backup servers: the higher the degree of redundancy (i.e. the more backup servers), the lower the likelihood of a catastrophic failure where all servers fail independently within a short timespan.
-However, implementing fault-tolerance through redundancy is a challenging problem: the CAP theorem proves that no redundant system can simultaneously satisfy the properties of consistency, availability, and partition tolerance \cite{gilbert2002brewer}.
-More generally, this describes the fundamental set of tradeoffs faced by any strategy for ensuring fault tolerance through redundancy.
-Similarly, stronger consistency guarantees come at the cost of higher latency during normal operation: at one end of the spectrum, strong consistency requires all replicas to agree on every operation.
 
 One strategy of replication, \textit{lazy replication}\footnote{also called \textit{optimistic replication}} \cite{Ladin:1990,Ladin:1992}, aims to provide the highest possible performance and availability by sacrificing consistency significantly.
 With this approach, replicas periodically exchange information, tolerating out-of-sync periods; thus, state may diverge on replicas, but is guaranteed to converge when the system quiesces for some period of time.
