@@ -5,16 +5,16 @@ In recent years, applications that communicate over local area networks have bec
 This trend has been accelerated not only by the proliferation of ``smart'' devices, but also by the adoption of standards that eliminate the burden of manually configuring devices in a network.
 Zero-configuration networking has become one of the most widely adopted such standards, and its suite of protocols allows devices to automatically discover other devices or peripherals in a network as well as their offered services~\cite{rfc6762, rfc6763}.
 
-While most applications are shipped with specific hardware/software to publish and discover services in a network, this can be done programmatically and one can devise new applications that communicate within a local area network.
+While most applications are shipped with specific hardware or software to publish and discover services in a network, recent innovations enable this to be done programmatically, making it easy to devise new applications that communicate within a local area network.
 As an example, browser vendors are integrating this technology and delivering a new set of Web applications built on top of Zeroconf.
 Indeed, the characteristics of Web applications are appealing for Zeroconf applications: since they obviate traditional installation models, browser-capable devices may become the only requirement for both server and client roles, as is the case in the example of Mozilla FlyWeb.
 
 While we see strong potential for Zeroconf Web applications, we argue that they still face the common challenges imposed by the type of network in which they operate.
-Specifically, maintaining reliability and consistency in the face of wireless links and mobile devices may result in intermittent connectivity between hosts and unpleasing user experience as a consequence.
-Therefore, we consider fault-tolerance and graceful recovery from failures, a highly desirable property for such applications.
-However, current APIs neither decouple Zeroconf logic from the application logic nor provide fault-tolerance.
+Specifically, maintaining reliability and consistency in the face of wireless links and mobile devices may result in intermittent connectivity between hosts and jarring user experience as a consequence.
+Therefore, we consider fault-tolerance and graceful recovery from failures to be highly desirable properties for such applications.
+To the best of our knowledge, no current APIs offer built-in fault-tolerance to local-area in-browser applications.
 
-To this end, we introduce Successorships, a JavaScript library that provides the appealing qualities of Zeroconf enriched with fault-tolerance, to applications running in the browser.
+To this end, we introduce Successorships, a JavaScript library intended for Zeroconf browser applications, that provides fault-tolerance functionality to developers, while completely abstracting away the details of its implementation.
 Our library enables graceful recovery after server failure by handing over the server role to one of the clients currently in the network.
 By exposing an easy-to-use API, we abstract away the complex details of Zeroconf communication, state replication and consistency and participants' roles of clients and servers.
 We evaluate our approach with a Successorships application used in a small mobile network.
