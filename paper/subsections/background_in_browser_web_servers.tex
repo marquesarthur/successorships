@@ -14,10 +14,9 @@ The FlyWeb project, developed by the Mozilla Firefox community, addresses the pr
 To this end, FlyWeb provides two key pieces of functionality: 
 \textit{(i)} an implementation of mDNS, allowing those services to advertise their name and address to peers on the local network, and 
 \textit{(ii)} a FlyWeb service discovery menu, which uses a built-in implementation of DNS-SD to enumerate locally-discovered services.
-The goal is for devices on a local network to be able to stream applications and content to one another using widely available Web technology.\footnote{https://hacks.mozilla.org/2016/09/flyweb-pure-web-cross-device-interaction/}
+The goal is for devices on a local network to be able to stream applications and content to one another using widely available Web technology.\footnote{\url{https://hacks.mozilla.org/2016/09/flyweb-pure-web-cross-device-interaction/}}
 FlyWeb was released in mid-2016, but is no longer actively maintained as of August 2017.
 
-A different challenge facing in-browser Web servers is that their availability is limited by the host machine's uptime.
-Dedicated server machines are usually non-mobile and optimized for availability; however, the class of devices that can run a Web browser is much wider, including mobile devices, hence posing a challenge to service availability.
+A different challenge facing in-browser Web servers is that their availability is limited by that of the host machine.
+Dedicated server machines usually have static network addresses and are often streamlined for serving Web content; however, the class of devices that can run a Web browser is much wider, including mobile devices, hence posing a novel challenge to service availability.
 To the best of our knowledge, at the time of writing, none of the currently-existing technologies address the issue of recovering from disruptions of server availability for in-browser Web services.
-
