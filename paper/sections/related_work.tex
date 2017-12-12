@@ -2,25 +2,34 @@
 \label{sec:related_work}
 
 \textbf{Zeroconf.}
-Several researchers propose have investigated Zeroconf~\cite{Gunes2002, Bohnenkamp2003, Jara:2012:IPv6DNS-SD}.
-For instance, \cite{hong2007accelerating} discusses that Zeroconf service discovery may cause overheads to the network while discovering new services.
-Thus, proposing an algorithm to accelerate service discovery based on network topology changes.
+Several researchers have investigated Zeroconf~\cite{Gunes2002, Bohnenkamp2003, Jara:2012:IPv6DNS-SD}.
+For instance, \cite{hong2007accelerating} discusses that Zeroconf service discovery may cause overhead to the network while discovering new services.
+Thus, they propose an algorithm to accelerate service discovery based on network topology changes.
 Since a server failure would imply a change in the network topology, i.e. the server node being removed from the topology, 
-client nodes our implementation could use their approach to accelerate service discovery. 
-Nonetheless, their implementation used a LINUX Wireless extensions, which may not be accessible within a browser.
+client nodes in our implementation could use their approach to accelerate service discovery. 
+Nonetheless, their implementation uses Linux Wireless extensions, which may not be accessible within a browser.
 Thus, we used the FlyWeb service discovery implementation.
 
 In~\cite{stolikj2016context}, Stolikj et al. argue that the number of published services in a network may also slow down service discovery.
-As a solution, they propose a context based approach, where queries specify which services they are interested in.
-This context based approach is highly suitable for our work and we could use it to filter \APIshort services.
+As a solution, they propose a context-based approach, where queries specify which services they are interested in.
+This approach is highly suitable for our work and we could use it to filter \APIshort services.
 However, their approach changes service discovery queries and we question whether this could be easily integrated with existing devices.
 
 
 \textbf{Local Networking APIs.}
-Opera Unite~\footnote{\url{http://help.opera.com/Linux/10.50/en/unite.html}, accessed 2017-12-11}
+Published in 2008, Universal Plug and Play (UPnP) is another widely-deployed set of networking protocols that facilitate discovery and interaction between devices on the same network, with minimal configuration.
+Since it leverages common protocols (HTTP/XML/SOAP on UDP/IP) and is agnostic to the link medium, it is truly cross-platform, extending not only to phones and laptops but also to printers, WiFi routers, and audio-visual equipment, to name a few examples.
+UPnP has been characterized as consisting of protocols that are more specific to particular classes of devices and applications; this is in contradistinction to Zeroconf, which aims to provide a device-agnostic foundation on which any device class or application-level protocol can build.~\footnote{\url{http://www.zeroconf.org/zeroconfandupnp.html}}
 
-Google Nearby~\footnote{\url{https://developers.google.com/nearby/connections/overview}, accessed 2017-12-11}
+More recently in 2017, as part of its \textit{Nearby} project, \textit{Google} released its \textit{Connections} API, which enables Android devices in close proximity to one another to communicate in a peer-to-peer fashion.~\footnote{\url{https://developers.google.com/nearby/connections/overview}, accessed 2017-12-11}
+This is done over a seamless mix of Bluetooth and WiFi hotspots.
+Unfortunately, Google has only made this API available on the Android platform; we seek a solution that is truly cross-platform.
 
+\textbf{In-browser web servers.}
+An early example of fully in-browser web server technology was \textit{Opera Unite} (2009)\footnote{\url{http://help.opera.com/Windows/12.10/en/unite.html, accessed 2017-12-11}}.
+This extension to the Opera browser enabled users to serve general-purpose Web applications directly from their browsers. 
+Communication between clients and servers in this way could either be via Opera Unite's proxy servers, which also offered a name registering and directory service, or direct peer-to-peer, the latter requiring more advanced technical configuration.
+Importantly, Opera Unite applications were constrained to be written as Opera ``Widgets''\footnote{An Opera Widget is an application that runs on Opera's now-deprecated Widget Engine, which allows such apps to be run independently of the browser.}.
+Though the service was popular with a sizeable subset of Opera users, especially for purposes such as file sharing and media streaming, Opera eventually retired Unite in 2012 to consolidate the multiple extension frameworks offered in its browser.\footnote{http://www.instantfundas.com/2012/04/opera-to-discontinue-unite-widgets-and.html}
 
-
-
+% TODO (PTC): Possibly add some notes on Web Server Chrome, and PeerServer.
