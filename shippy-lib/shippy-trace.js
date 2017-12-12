@@ -1,4 +1,11 @@
+/**
+ * Our trace module. This is only used for evalation purposes and should not be shipped with a productive version
+ * of our library. Also, it introduces a second global object `Trace` which we want to avoid in case of becoming
+ * productive.
+ */
 let Trace = (function () {
+
+	const TRACE_ENABLED = false;
 
 	const logKey = 'shippy:log:' + Date.now().toString() + ':' + Math.random().toString();
 
@@ -7,6 +14,9 @@ let Trace = (function () {
 	let backupThreshold = 500;
 
 	function save() {
+		if (!TRACE_ENABLED) {
+			return;
+		}
 		// Creates chuncks of the log with at most 500 events.
 		// This will prevent POSTs with a payload size higher than what our measurement server can handle
 		let chunks = [], size = 500;
@@ -40,6 +50,9 @@ let Trace = (function () {
 	}
 
 	function log(traceData) {
+		if (!TRACE_ENABLED) {
+			return;
+		}
 		shippyLog.push(traceData);
 		backup();
 	}
