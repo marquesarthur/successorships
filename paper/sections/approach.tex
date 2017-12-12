@@ -1,7 +1,14 @@
 \section{Successorships}
 \label{sec:approach}
 
-\input{subsections/approach_goals_and_assumptions}
+Our goal is to provide a framework to build Zeroconf Web applications and expose an easy-to-use API to application developers. 
+We aim to provide fault-tolerance seamlessly without the developer having to deal with the underlying details of state replication and consistency challenges. 
+We implemented our approach as a JavaScript library and describe it in the following sections.
+We first cover a few necessary assumptions to make this implementation tractable and then explain our exposed API. 
+We then continue with a more detailed conceptual description and our replication strategy and consistency guarantees.
+Finally, we elaborate on what failure scenarios are handled by our approach.
+
+\input{subsections/approach_assumptions}
 
 \input{subsections/approach_api_overview}
 
